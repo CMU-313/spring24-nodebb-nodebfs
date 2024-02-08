@@ -25,6 +25,8 @@ const events = require('../src/events');
 
 const socketAdmin = require('../src/socket.io/admin');
 
+const socketModules = require('../src/socket.io/modules');
+
 describe('socket.io', () => {
     let io;
     let cid;
@@ -51,7 +53,46 @@ describe('socket.io', () => {
         cid = data[2].cid;
     });
 
+    it('should throw an error if data is invalid for socketModules.chats.newRoom', async () => {
+        try {
+            await socketModules.chats.newRoom({}, null);
+        } catch (err) {
+            assert.strictEqual(err.message, '[[error:invalid-data]]');
+        }
+    });
 
+    it('should throw an error if data is invalid for socketModules.chats.send', async () => {
+        try {
+            await socketModules.chats.send({}, null);
+        } catch (err) {
+            assert.strictEqual(err.message, '[[error:invalid-data]]');
+        }
+    });
+
+    it('should throw an error if data is invalid for socketModules.chats.loadRoom', async () => {
+        try {
+            await socketModules.chats.loadRoom({}, null);
+        } catch (err) {
+            assert.strictEqual(err.message, '[[error:invalid-data]]');
+        }
+    });
+
+    it('should throw an error if data is invalid for socketModules.chats.getUsersInRoom', async () => {
+        try {
+            await socketModules.chats.getUsersInRoom({}, null);
+        } catch (err) {
+            assert.strictEqual(err.message, '[[error:invalid-data]]');
+        }
+    });
+
+    it('should throw an error if data is invalid for socketModules.chats.addUserToRoom', async () => {
+        try {
+            await socketModules.chats.addUserToRoom({}, null);
+        } catch (err) {
+            assert.strictEqual(err.message, '[[error:invalid-data]]');
+        }
+    });
+    
     it('should connect and auth properly', (done) => {
         request.get({
             url: `${nconf.get('url')}/api/config`,
