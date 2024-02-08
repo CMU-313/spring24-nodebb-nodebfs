@@ -92,7 +92,7 @@ describe('socket.io', () => {
             assert.strictEqual(err.message, '[[error:invalid-data]]');
         }
     });
-    
+
     it('should connect and auth properly', (done) => {
         request.get({
             url: `${nconf.get('url')}/api/config`,
