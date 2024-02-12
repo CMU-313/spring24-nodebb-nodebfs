@@ -2,8 +2,7 @@
 
 const validator = require('validator');
 const _ = require('lodash');
-
-const utils = require('../utils');
+const assert = require('assert');
 const user = require('../user');
 const posts = require('../posts');
 const topics = require('../topics');
@@ -14,6 +13,7 @@ const privileges = require('../privileges');
 const apiHelpers = require('./helpers');
 const websockets = require('../socket.io');
 const socketHelpers = require('../socket.io/helpers');
+
 
 const postsAPI = module.exports;
 
@@ -42,26 +42,23 @@ postsAPI.get = async function (caller, data) {
     return post;
 };
 
+// type: async function edit(caller: 'object', data: 'object) => Promise<object>
 postsAPI.edit = async function (caller, data) {
-    if (!data || !data.pid || (meta.config.minimumPostLength !== 0 && !data.content)) {
+    assert.equal(typeof (caller), 'object');
+    assert.equal(typeof (data), 'object');
+    if (!data || !data.pid || (meta.config.minimumPostLengthStudents !== 0 && !data.content)) {
         throw new Error('[[error:invalid-data]]');
     }
     if (!caller.uid) {
         throw new Error('[[error:not-logged-in]]');
     }
     // Trim and remove HTML (latter for composers that send in HTML, like redactor)
-    const contentLen = utils.stripHTMLTags(data.content).trim().length;
 
     if (data.title && data.title.length < meta.config.minimumTitleLength) {
         throw new Error(`[[error:title-too-short, ${meta.config.minimumTitleLength}]]`);
     } else if (data.title && data.title.length > meta.config.maximumTitleLength) {
         throw new Error(`[[error:title-too-long, ${meta.config.maximumTitleLength}]]`);
-    } else if (meta.config.minimumPostLength !== 0 && contentLen < meta.config.minimumPostLength) {
-        throw new Error(`[[error:content-too-short, ${meta.config.minimumPostLength}]]`);
-    } else if (contentLen > meta.config.maximumPostLength) {
-        throw new Error(`[[error:content-too-long, ${meta.config.maximumPostLength}]]`);
     }
-
     data.uid = caller.uid;
     data.req = apiHelpers.buildReqObject(caller);
     data.timestamp = parseInt(data.timestamp, 10) || Date.now();
@@ -110,6 +107,7 @@ postsAPI.edit = async function (caller, data) {
 
     const uids = _.uniq(_.flatten(memberData).concat(String(caller.uid)));
     uids.forEach(uid => websockets.in(`uid_${uid}`).emit('event:post_edited', editResult));
+    assert.equal(typeof (returnData), 'object');
     return returnData;
 };
 

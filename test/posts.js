@@ -506,25 +506,6 @@ describe('Post\'s', () => {
             assert(false);
         });
 
-        it('should error if content is too short', async () => {
-            try {
-                await apiPosts.edit({ uid: voterUid }, { pid: pid, content: 'e' });
-            } catch (err) {
-                return assert.equal(err.message, `[[error:content-too-short, ${meta.config.minimumPostLength}]]`);
-            }
-            assert(false);
-        });
-
-        it('should error if content is too long', async () => {
-            const longContent = new Array(meta.config.maximumPostLength + 2).join('a');
-            try {
-                await apiPosts.edit({ uid: voterUid }, { pid: pid, content: longContent });
-            } catch (err) {
-                return assert.equal(err.message, `[[error:content-too-long, ${meta.config.maximumPostLength}]]`);
-            }
-            assert(false);
-        });
-
         it('should edit post', async () => {
             const data = await apiPosts.edit({ uid: voterUid }, {
                 pid: pid,

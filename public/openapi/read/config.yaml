@@ -31,9 +31,13 @@ get:
                 type: number
               maximumTitleLength:
                 type: number
-              minimumPostLength:
+              minimumPostLengthStudents:
                 type: number
-              maximumPostLength:
+              maximumPostLengthStudents:
+                type: number
+              minimumPostLengthInstructors:
+                type: number
+              maximumPostLengthInstructors:
                 type: number
               minimumTagsPerTopic:
                 type: number
