@@ -1,5 +1,6 @@
 'use strict';
 
+const assert = require('assert');
 const meta = require('../meta');
 const db = require('../database');
 const flags = require('../flags');
@@ -122,7 +123,16 @@ module.exports = function (Posts) {
         return await vote(type, false, pid, uid, voteStatus);
     }
 
+    // async function unvote(pid: string, uid: number, type: string,
+    //  voteStatus: { upvoted: boolean, downvoted: boolean }): Promise<void>
     async function unvote(pid, uid, type, voteStatus) {
+        // assert function parameter types in the body
+        assert(typeof (pid), 'string');
+        assert(typeof (uid), 'number');
+        assert(typeof (type), 'string');
+        // specifically, voteStatus is of type { upvoted: boolean, downvoted: boolean }
+        assert(typeof (voteStatus), 'object');
+
         if (type === 'downvote' || type === 'upvote') {
             await checkVoteLimitation(pid, uid, type);
         }
@@ -131,6 +141,12 @@ module.exports = function (Posts) {
             return;
         }
 
+        // assert function return types in the body
+        assert(typeof (voteStatus.upvoted), 'boolean');
+        assert(typeof (pid), 'string');
+        assert(typeof (uid), 'number');
+        // specifically, voteStatus is of type { upvoted: boolean, downvoted: boolean }
+        assert(typeof (voteStatus), 'object');
         return await vote(voteStatus.upvoted ? 'downvote' : 'upvote', true, pid, uid, voteStatus);
     }
 
