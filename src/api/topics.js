@@ -1,5 +1,6 @@
 'use strict';
 
+const assert = require('assert');
 const user = require('../user');
 const topics = require('../topics');
 const posts = require('../posts');
@@ -65,8 +66,11 @@ topicsAPI.create = async function (caller, data) {
     return result.topicData;
 };
 
+// type: async function reply(caller: 'object', data: 'object) => Promise<object>
 topicsAPI.reply = async function (caller, data) {
-    if (!data || !data.tid || (meta.config.minimumPostLength !== 0 && !data.content)) {
+    assert.equal(typeof (caller), 'object');
+    assert.equal(typeof (data), 'object');
+    if (!data || !data.tid || (meta.config.minimumPostLengthStudents !== 0 && !data.content)) {
         throw new Error('[[error:invalid-data]]');
     }
     const payload = { ...data };
@@ -96,6 +100,7 @@ topicsAPI.reply = async function (caller, data) {
 
     socketHelpers.notifyNew(caller.uid, 'newPost', result);
 
+    assert.equal(typeof (postObj[0]), 'object');
     return postObj[0];
 };
 

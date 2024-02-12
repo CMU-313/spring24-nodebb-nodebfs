@@ -3,6 +3,7 @@
 const validator = require('validator');
 const nconf = require('nconf');
 
+const assert = require('assert');
 const meta = require('../meta');
 const user = require('../user');
 const categories = require('../categories');
@@ -19,7 +20,10 @@ const socketioTransports = nconf.get('socket.io:transports') || ['polling', 'web
 const socketioOrigins = nconf.get('socket.io:origins');
 const websocketAddress = nconf.get('socket.io:address') || '';
 
+// type: async function loadConfig(req: object) => Promise<object>
 apiController.loadConfig = async function (req) {
+    // assert parameter type
+    assert.equal(typeof (req), 'object');
     const config = {
         relative_path,
         upload_url,
@@ -32,8 +36,10 @@ apiController.loadConfig = async function (req) {
         maintenanceMode: meta.config.maintenanceMode === 1,
         minimumTitleLength: meta.config.minimumTitleLength,
         maximumTitleLength: meta.config.maximumTitleLength,
-        minimumPostLength: meta.config.minimumPostLength,
-        maximumPostLength: meta.config.maximumPostLength,
+        minimumPostLengthStudents: meta.config.minimumPostLengthStudents,
+        maximumPostLengthStudents: meta.config.maximumPostLengthStudents,
+        minimumPostLengthInstructors: meta.config.minimumPostLengthInstructors,
+        maximumPostLengthInstructors: meta.config.maximumPostLengthInstructors,
         minimumTagsPerTopic: meta.config.minimumTagsPerTopic || 0,
         maximumTagsPerTopic: meta.config.maximumTagsPerTopic || 5,
         minimumTagLength: meta.config.minimumTagLength || 3,
@@ -114,8 +120,11 @@ apiController.loadConfig = async function (req) {
 
     // Overrides based on privilege
     config.disableChatMessageEditing = isAdminOrGlobalMod ? false : config.disableChatMessageEditing;
+    const res = await plugins.hooks.fire('filter:config.get', config);
 
-    return await plugins.hooks.fire('filter:config.get', config);
+    // assert return type
+    assert.equal(typeof (res), 'object');
+    return res;
 };
 
 apiController.getConfig = async function (req, res) {

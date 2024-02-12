@@ -3,6 +3,7 @@
 
 const _ = require('lodash');
 
+const assert = require('assert');
 const db = require('../database');
 const utils = require('../utils');
 const slugify = require('../slugify');
@@ -76,7 +77,9 @@ module.exports = function (Topics) {
         return topicData.tid;
     };
 
+    // type: async function post(data: 'object') => object
     Topics.post = async function (data) {
+        assert.equal(typeof (data), 'object');
         data = await plugins.hooks.fire('filter:topic.post', data);
         const { uid } = data;
 
@@ -89,7 +92,12 @@ module.exports = function (Topics) {
         await Topics.validateTags(data.tags, data.cid, uid);
         data.tags = await Topics.filterTags(data.tags, data.cid);
         if (!data.fromQueue) {
-            Topics.checkContent(data.content);
+            const u0 = await user.getUsersFields([uid], ['accounttype']);
+            if (u0[0].accounttype === 'student') {
+                Topics.checkContent(data.content);
+            } else {
+                Topics.checkContent2(data.content);
+            }
         }
 
         const [categoryExists, canCreate, canTag] = await Promise.all([
@@ -149,13 +157,17 @@ module.exports = function (Topics) {
             user.notifications.sendTopicNotificationToFollowers(uid, topicData, postData);
         }
 
-        return {
+        const ret = {
             topicData: topicData,
             postData: postData,
         };
+        assert.equal(typeof (ret), 'object');
+        return ret;
     };
 
+    // type: async function post(data: 'object') => object
     Topics.reply = async function (data) {
+        assert.equal(typeof (data), 'object');
         data = await plugins.hooks.fire('filter:topic.reply', data);
         const { tid } = data;
         const { uid } = data;
@@ -172,7 +184,12 @@ module.exports = function (Topics) {
         }
         if (!data.fromQueue) {
             await user.isReadyToPost(uid, data.cid);
-            Topics.checkContent(data.content);
+            const u0 = await user.getUsersFields([uid], ['accounttype']);
+            if (u0[0].accounttype === 'student') {
+                Topics.checkContent(data.content);
+            } else {
+                Topics.checkContent2(data.content);
+            }
         }
 
         // For replies to scheduled topics, don't have a timestamp older than topic's itself
@@ -207,6 +224,7 @@ module.exports = function (Topics) {
         analytics.increment(['posts', `posts:byCid:${data.cid}`]);
         plugins.hooks.fire('action:topic.reply', { post: _.clone(postData), data: data });
 
+        assert.equal(typeof (postData), 'object');
         return postData;
     };
 
@@ -249,8 +267,17 @@ module.exports = function (Topics) {
         check(title, meta.config.minimumTitleLength, meta.config.maximumTitleLength, 'title-too-short', 'title-too-long');
     };
 
+    // type: function checkContent(content: 'string') => object
+    // returns null, which is of type object
     Topics.checkContent = function (content) {
-        check(content, meta.config.minimumPostLength, meta.config.maximumPostLength, 'content-too-short', 'content-too-long');
+        assert.equal(typeof (content), 'string');
+        check(content, meta.config.minimumPostLengthStudents, meta.config.maximumPostLengthStudents, 'content-too-short', 'content-too-long');
+    };
+    // type: function checkContent2(content: 'string') => object
+    // returns null, which is of type object
+    Topics.checkContent2 = function (content) {
+        assert.equal(typeof (content), 'string');
+        check(content, meta.config.minimumPostLengthInstructors, meta.config.maximumPostLengthInstructors, 'content-too-short', 'content-too-long');
     };
 
     function check(item, min, max, minError, maxError) {

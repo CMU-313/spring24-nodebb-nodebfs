@@ -41,12 +41,22 @@
                 </div>
                 <div class="col-xs-6">
                     <div class="form-group">
-                        <label for="minimumPostLength">[[admin/settings/post:restrictions.min-post-length]]</label>
-                        <input id="minimumPostLength" type="text" class="form-control" value="8" data-field="minimumPostLength">
+                        <label for="minimumPostLengthStudents">[[admin/settings/post:restrictions.min-post-length-student]]</label>
+                        <input id="minimumPostLengthStudents" type="text" class="form-control" value="1" data-field="minimumPostLengthStudents">
                     </div>
                     <div class="form-group">
-                        <label for="maximumPostLength">[[admin/settings/post:restrictions.max-post-length]]</label>
-                        <input id="maximumPostLength" type="text" class="form-control" value="32767" data-field="maximumPostLength">
+                        <label for="maximumPostLengthStudents">[[admin/settings/post:restrictions.max-post-length-student]]</label>
+                        <input id="maximumPostLengthStudents" type="text" class="form-control" value="32767" data-field="maximumPostLengthStudents">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="minimumPostLengthInstructors">[[admin/settings/post:restrictions.min-post-length-instructor]]</label>
+                        <input id="minimumPostLengthInstructors" type="text" class="form-control" value="1" data-field="minimumPostLengthInstructors">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="maximumPostLengthInstructors">[[admin/settings/post:restrictions.max-post-length-student]]</label>
+                        <input id="maximumPostLengthInstructors" type="text" class="form-control" value="32767" data-field="maximumPostLengthInstructors">
                     </div>
                 </div>
             </div>
