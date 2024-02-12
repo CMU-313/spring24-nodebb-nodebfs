@@ -245,7 +245,7 @@ jhs-panda
 </svg>
 <a xlink:href="https://github.com/CMU-313/spring24-nodebb-nodebfs/commits?author=jhs-panda&amp;since=2024-01-20T00:00:00-05:00&amp;until=2024-03-29T23:59:00-05:00">
 <text class="stat" x="25" y="12.5">
-Commit: 0
+Commit: 1
 </text>
 </a>
 </g>
@@ -254,7 +254,7 @@ Commit: 0
 <path d="M24 10h-10v-10h-4v10h-10v4h10v10h4v-10h10z" fill-rule="evenodd"/>
 </svg>
 <text class="stat" x="25" y="12.5">
-Addition: 0
+Addition: 15
 </text>
 </g>
 <g transform="translate(0, 50)">
@@ -262,7 +262,7 @@ Addition: 0
 <path d="M0 10h24v4h-24z" fill-rule="evenodd"/>
 </svg>
 <text class="stat" x="25" y="12.5">
-Deletion: 0
+Deletion: 4
 </text>
 </g>
 <g transform="translate(0, 75)">
