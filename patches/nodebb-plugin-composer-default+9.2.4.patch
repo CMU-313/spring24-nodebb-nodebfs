@@ -1,0 +1,47 @@
+diff --git a/node_modules/nodebb-plugin-composer-default/static/less/medium.less b/node_modules/nodebb-plugin-composer-default/static/less/medium.less
+index b2856fb..d4b5fc8 100644
+--- a/node_modules/nodebb-plugin-composer-default/static/less/medium.less
++++ b/node_modules/nodebb-plugin-composer-default/static/less/medium.less
+@@ -15,6 +15,8 @@
+ 
+ 	.title-container {
+ 		border: 0;
++		display: flex;
++		align-items: center;
+ 
+ 		.title, .handle {
+ 			font-size: 22px;
+diff --git a/node_modules/nodebb-plugin-composer-default/static/templates/composer.tpl b/node_modules/nodebb-plugin-composer-default/static/templates/composer.tpl
+index cf9de24..ae6bf84 100644
+--- a/node_modules/nodebb-plugin-composer-default/static/templates/composer.tpl
++++ b/node_modules/nodebb-plugin-composer-default/static/templates/composer.tpl
+@@ -52,14 +52,21 @@
+ 			</div>
+ 
+ 			<div class="btn-group pull-right action-bar hidden-sm hidden-xs">
+-				<button class="btn btn-default composer-discard" data-action="discard" tabindex="-1"><i class="fa fa-times"></i> [[topic:composer.discard]]</button>
+-
+-				<ul class="dropdown-menu">{{{ each submitOptions }}}<li><a href="#" data-action="{./action}">{./text}</a></li>{{{ end }}}</ul>
+-				<button class="btn btn-primary composer-submit" data-action="post" tabindex="6" data-text-variant=" [[topic:composer.schedule]]"><i class="fa fa-check"></i> [[topic:composer.submit]]</button>
+-				<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+-					<span class="caret"></span>
+-					<span class="sr-only">[[topic:composer.additional-options]]</span>
+-				</button>
++				<div class="action-bar">
++					<input class="anonymous" type="checkbox" value="" id="anonymous">
++					<label class="form-check-label" for="anonymous">
++						Make Anonymous
++					</label>
++				</div>
++				<div class="action-bar">
++					<button class="btn btn-default composer-discard" data-action="discard" tabindex="-1"><i class="fa fa-times"></i> [[topic:composer.discard]]</button>
++					<ul class="dropdown-menu">{{{ each submitOptions }}}<li><a href="#" data-action="{./action}">{./text}</a></li>{{{ end }}}</ul>
++					<button class="btn btn-primary composer-submit" data-action="post" tabindex="6" data-text-variant=" [[topic:composer.schedule]]"><i class="fa fa-check"></i> [[topic:composer.submit]]</button>
++					<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
++						<span class="caret"></span>
++						<span class="sr-only">[[topic:composer.additional-options]]</span>
++					</button>
++				</div>
+ 			</div>
+ 		</div>
+ 
