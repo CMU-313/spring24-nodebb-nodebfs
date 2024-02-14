@@ -1,20 +1,163 @@
-diff --git a/node_modules/nodebb-plugin-composer-default/static/less/medium.less b/node_modules/nodebb-plugin-composer-default/static/less/medium.less
-index b2856fb..d4b5fc8 100644
---- a/node_modules/nodebb-plugin-composer-default/static/less/medium.less
-+++ b/node_modules/nodebb-plugin-composer-default/static/less/medium.less
-@@ -15,6 +15,8 @@
+diff --git a/node_modules/nodebb-plugin-composer-default/static/lib/composer.js b/node_modules/nodebb-plugin-composer-default/static/lib/composer.js
+index 46334e7..c7b4d55 100644
+--- a/node_modules/nodebb-plugin-composer-default/static/lib/composer.js
++++ b/node_modules/nodebb-plugin-composer-default/static/lib/composer.js
+@@ -1,5 +1,7 @@
+ 'use strict';
  
- 	.title-container {
- 		border: 0;
-+		display: flex;
-+		align-items: center;
++const { assert } = require("../../../../src/middleware");
++
+ define('composer', [
+ 	'taskbar',
+ 	'translator',
+@@ -622,16 +624,19 @@ define('composer', [
+ 		}, 20);
+ 	}
  
- 		.title, .handle {
- 			font-size: 22px;
++    // type: async function post(post_uuid: ) => Promise<void>
+ 	async function post(post_uuid) {
++        var ret; // for checking return types
++        assert.equal(typeof (post_uuid), 'string');
+ 		var postData = composer.posts[post_uuid];
+ 		var postContainer = $('.composer[data-uuid="' + post_uuid + '"]');
+ 		var handleEl = postContainer.find('.handle');
++        var anonymousEl = postContainer.find('#anonymous').is(':checked');
+ 		var titleEl = postContainer.find('.title');
+ 		var bodyEl = postContainer.find('textarea');
+ 		var thumbEl = postContainer.find('input#topic-thumb-url');
+ 		var onComposeRoute = postData.hasOwnProperty('template') && postData.template.compose === true;
+ 		const submitBtn = postContainer.find('.composer-submit');
+-
+ 		titleEl.val(titleEl.val().trim());
+ 		bodyEl.val(utils.rtrim(bodyEl.val()));
+ 		if (thumbEl.length) {
+@@ -658,25 +663,52 @@ define('composer', [
+ 		$(window).trigger('action:composer.check', payload);
+ 
+ 		if (payload.error) {
+-			return composerAlert(post_uuid, payload.error);
++            ret = composerAlert(post_uuid, payload.error);
++            await ret;
++            assert.equal(typeof (await ret), 'undefined');
++            return ret;
+ 		}
+ 
+ 		if (uploads.inProgress[post_uuid] && uploads.inProgress[post_uuid].length) {
+-			return composerAlert(post_uuid, '[[error:still-uploading]]');
++            ret = composerAlert(post_uuid, '[[error:still-uploading]]');
++            await ret;
++            assert.equal(typeof (await ret), 'undefined');
++            return ret;
+ 		} else if (checkTitle && payload.titleLen < parseInt(config.minimumTitleLength, 10)) {
+-			return composerAlert(post_uuid, '[[error:title-too-short, ' + config.minimumTitleLength + ']]');
++            ret = composerAlert(post_uuid, '[[error:title-too-short, ' + config.minimumTitleLength + ']]');
++            await ret;
++            assert.equal(typeof (await ret), 'undefined');
++            return ret;
+ 		} else if (checkTitle && payload.titleLen > parseInt(config.maximumTitleLength, 10)) {
+-			return composerAlert(post_uuid, '[[error:title-too-long, ' + config.maximumTitleLength + ']]');
++            ret = composerAlert(post_uuid, '[[error:title-too-long, ' + config.maximumTitleLength + ']]');
++            await ret;
++            assert.equal(typeof (await ret), 'undefined');
++            return ret;
+ 		} else if (action === 'topics.post' && !isCategorySelected) {
+-			return composerAlert(post_uuid, '[[error:category-not-selected]]');
++            ret = composerAlert(post_uuid, '[[error:category-not-selected]]');
++            await ret;
++            assert.equal(typeof (await ret), 'undefined');
++            return ret;
+ 		} else if (payload.bodyLen < parseInt(config.minimumPostLength, 10)) {
+-			return composerAlert(post_uuid, '[[error:content-too-short, ' + config.minimumPostLength + ']]');
++            ret = composerAlert(post_uuid, '[[error:content-too-short, ' + config.minimumPostLength + ']]');
++            await ret;
++            assert.equal(typeof (await ret), 'undefined');
++            return ret;
+ 		} else if (payload.bodyLen > parseInt(config.maximumPostLength, 10)) {
+-			return composerAlert(post_uuid, '[[error:content-too-long, ' + config.maximumPostLength + ']]');
++            ret = composerAlert(post_uuid, '[[error:content-too-long, ' + config.maximumPostLength + ']]');
++            await ret;
++            assert.equal(typeof (await ret), 'undefined');
++            return ret;
+ 		} else if (checkTitle && !tags.isEnoughTags(post_uuid)) {
+-			return composerAlert(post_uuid, '[[error:not-enough-tags, ' + tags.minTagCount() + ']]');
++            ret = composerAlert(post_uuid, '[[error:not-enough-tags, ' + tags.minTagCount() + ']]');
++            await ret;
++            assert.equal(typeof (await ret), 'undefined');
++            return ret;
+ 		} else if (scheduler.isActive() && scheduler.getTimestamp() <= Date.now()) {
+-			return composerAlert(post_uuid, '[[error:scheduling-to-past]]');
++            ret = composerAlert(post_uuid, '[[error:scheduling-to-past]]');
++            await ret;
++            assert.equal(typeof (await ret), 'undefined');
++            return ret;
+ 		}
+ 
+ 		let composerData = {
+@@ -690,6 +722,7 @@ define('composer', [
+ 			composerData = {
+ 				...composerData,
+ 				handle: handleEl ? handleEl.val() : undefined,
++                anonymous: anonymousEl,
+ 				title: titleEl.val(),
+ 				content: bodyEl.val(),
+ 				thumb: thumbEl.val() || '',
+@@ -703,6 +736,7 @@ define('composer', [
+ 				...composerData,
+ 				tid: postData.tid,
+ 				handle: handleEl ? handleEl.val() : undefined,
++                anonymous: anonymousEl,
+ 				content: bodyEl.val(),
+ 				toPid: postData.toPid,
+ 			};
+@@ -713,6 +747,7 @@ define('composer', [
+ 				...composerData,
+ 				pid: postData.pid,
+ 				handle: handleEl ? handleEl.val() : undefined,
++                anonymous: anonymousEl,
+ 				content: bodyEl.val(),
+ 				title: titleEl.val(),
+ 				thumb: thumbEl.val() || '',
+@@ -759,7 +794,7 @@ define('composer', [
+ 				} else if (action === 'topics.post') {
+ 					if (submitHookData.redirect) {
+ 						ajaxify.go('topic/' + data.slug, undefined, (onComposeRoute || composer.bsEnvironment === 'xs' || composer.bsEnvironment === 'sm'));
+-					}
++                    }
+ 				} else if (action === 'posts.reply') {
+ 					if (onComposeRoute || composer.bsEnvironment === 'xs' || composer.bsEnvironment === 'sm') {
+ 						window.history.back();
+@@ -772,7 +807,6 @@ define('composer', [
+ 				} else {
+ 					removeComposerHistory();
+ 				}
+-
+ 				hooks.fire('action:composer.' + action, { composerData: composerData, data: data });
+ 			})
+ 			.catch((err) => {
+@@ -780,7 +814,9 @@ define('composer', [
+ 				composer.load(post_uuid);
+ 				textareaEl.prop('readonly', false);
+ 				if (err.message === '[[error:email-not-confirmed]]') {
+-					return messagesModule.showEmailConfirmWarning(err.message);
++                    ret = messagesModule.showEmailConfirmWarning(err.message);
++                    assert.equal(typeof (ret), 'undefined');
++                    return ret;
+ 				}
+ 				composerAlert(post_uuid, err.message);
+ 			});
 diff --git a/node_modules/nodebb-plugin-composer-default/static/templates/composer.tpl b/node_modules/nodebb-plugin-composer-default/static/templates/composer.tpl
-index cf9de24..ae6bf84 100644
+index cf9de24..81e6021 100644
 --- a/node_modules/nodebb-plugin-composer-default/static/templates/composer.tpl
 +++ b/node_modules/nodebb-plugin-composer-default/static/templates/composer.tpl
+@@ -8,7 +8,7 @@
+ 			</div>
+ 			<!-- IF isTopic -->
+ 			<div class="category-name-container">
+-				<span class="category-name"></span> <i class="fa fa-sort"></i>
++				<span class="category-name"></span><i class="fa fa-sort"></i>
+ 			</div>
+ 			<!-- ENDIF isTopic -->
+ 			<!-- IF !isTopicOrMain -->
 @@ -52,14 +52,21 @@
  			</div>
  

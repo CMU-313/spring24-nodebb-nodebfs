@@ -533,6 +533,9 @@ describe('API', async () => {
             return;
         }
 
+        // filter out anonymous property because it might not exist in all cases
+        required = required.filter(prop => prop !== 'anonymous');
+
         // Compare the schema to the response
         required.forEach((prop) => {
             if (schema.hasOwnProperty(prop)) {

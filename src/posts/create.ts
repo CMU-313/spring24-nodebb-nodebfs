@@ -18,6 +18,7 @@ type CreateData = {
   handle?: string;
   uid?: string;
   tid?: string;
+  anonymous?: boolean;
 }
 
 type PostData = {
@@ -31,6 +32,7 @@ type PostData = {
   cid?: string;
   content: string;
   timestamp: number | Date;
+  anonymous?: boolean;
 }
 
 module.exports = function (Posts: { create: (data: CreateData) => Promise<unknown>, uploads:
@@ -53,6 +55,7 @@ module.exports = function (Posts: { create: (data: CreateData) => Promise<unknow
         const content = data.content.toString();
         const timestamp = data.timestamp || Date.now();
         const isMain = data.isMain || false;
+        const isAnon = data.anonymous;
 
         if (!uid && parseInt(uid, 10) !== 0) {
             throw new Error('[[error:invalid-uid]]');
@@ -71,6 +74,7 @@ module.exports = function (Posts: { create: (data: CreateData) => Promise<unknow
             tid: tid,
             content: content,
             timestamp: timestamp,
+            anonymous: isAnon,
         };
 
         if (data.toPid) {

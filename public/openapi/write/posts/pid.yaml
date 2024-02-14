@@ -12,7 +12,7 @@ get:
       description: a valid post id
       example: 1
   responses:
-    '200':
+    "200":
       description: Post successfully retrieved
       content:
         application/json:
@@ -64,6 +64,9 @@ get:
                     type: boolean
                   downvoted:
                     type: boolean
+                  anonymous:
+                    type: boolean
+                    nullable: true
 put:
   tags:
     - posts
@@ -95,7 +98,7 @@ put:
           required:
             - content
   responses:
-    '200':
+    "200":
       description: Post successfully edited
       content:
         application/json:
@@ -127,7 +130,7 @@ delete:
       description: a valid post id
       example: 1
   responses:
-    '200':
+    "200":
       description: Post successfully purged
       content:
         application/json:
