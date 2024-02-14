@@ -1,5 +1,5 @@
 diff --git a/node_modules/nodebb-plugin-composer-default/static/lib/composer.js b/node_modules/nodebb-plugin-composer-default/static/lib/composer.js
-index 46334e7..33e10d2 100644
+index 46334e7..c7b4d55 100644
 --- a/node_modules/nodebb-plugin-composer-default/static/lib/composer.js
 +++ b/node_modules/nodebb-plugin-composer-default/static/lib/composer.js
 @@ -1,5 +1,7 @@
@@ -101,7 +101,23 @@ index 46334e7..33e10d2 100644
  				title: titleEl.val(),
  				content: bodyEl.val(),
  				thumb: thumbEl.val() || '',
-@@ -759,7 +792,7 @@ define('composer', [
+@@ -703,6 +736,7 @@ define('composer', [
+ 				...composerData,
+ 				tid: postData.tid,
+ 				handle: handleEl ? handleEl.val() : undefined,
++                anonymous: anonymousEl,
+ 				content: bodyEl.val(),
+ 				toPid: postData.toPid,
+ 			};
+@@ -713,6 +747,7 @@ define('composer', [
+ 				...composerData,
+ 				pid: postData.pid,
+ 				handle: handleEl ? handleEl.val() : undefined,
++                anonymous: anonymousEl,
+ 				content: bodyEl.val(),
+ 				title: titleEl.val(),
+ 				thumb: thumbEl.val() || '',
+@@ -759,7 +794,7 @@ define('composer', [
  				} else if (action === 'topics.post') {
  					if (submitHookData.redirect) {
  						ajaxify.go('topic/' + data.slug, undefined, (onComposeRoute || composer.bsEnvironment === 'xs' || composer.bsEnvironment === 'sm'));
@@ -110,7 +126,7 @@ index 46334e7..33e10d2 100644
  				} else if (action === 'posts.reply') {
  					if (onComposeRoute || composer.bsEnvironment === 'xs' || composer.bsEnvironment === 'sm') {
  						window.history.back();
-@@ -772,7 +805,6 @@ define('composer', [
+@@ -772,7 +807,6 @@ define('composer', [
  				} else {
  					removeComposerHistory();
  				}
@@ -118,7 +134,7 @@ index 46334e7..33e10d2 100644
  				hooks.fire('action:composer.' + action, { composerData: composerData, data: data });
  			})
  			.catch((err) => {
-@@ -780,7 +812,9 @@ define('composer', [
+@@ -780,7 +814,9 @@ define('composer', [
  				composer.load(post_uuid);
  				textareaEl.prop('readonly', false);
  				if (err.message === '[[error:email-not-confirmed]]') {
