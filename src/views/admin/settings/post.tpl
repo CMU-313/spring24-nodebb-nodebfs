@@ -31,12 +31,20 @@
             <div class="row">
                 <div class="col-xs-6">
                     <div class="form-group">
-                        <label for="minimumTitleLength">[[admin/settings/post:restrictions.min-title-length]]</label>
-                        <input id="minimumTitleLength" type="text" class="form-control" value="3" data-field="minimumTitleLength">
+                        <label for="minimumTitleLengthStudents">[[admin/settings/post:restrictions.min-title-length-student]]</label>
+                        <input id="minimumTitleLengthStudents" type="text" class="form-control" value="1" data-field="minimumTitleLengthStudents">
                     </div>
                     <div class="form-group">
-                        <label for="maximumTitleLength">[[admin/settings/post:restrictions.max-title-length]]</label>
-                        <input id="maximumTitleLength" type="text" class="form-control" value="255" data-field="maximumTitleLength">
+                        <label for="maximumTitleLengthStudents">[[admin/settings/post:restrictions.max-title-length-student]]</label>
+                        <input id="maximumTitleLengthStudents" type="text" class="form-control" value="255" data-field="maximumTitleLengthStudents">
+                    </div>
+                    <div class="form-group">
+                        <label for="minimumTitleLengthInstructors">[[admin/settings/post:restrictions.min-title-length-instructor]]</label>
+                        <input id="minimumTitleLengthInstructors" type="text" class="form-control" value="1" data-field="minimumTitleLengthInstructors">
+                    </div>
+                    <div class="form-group">
+                        <label for="maximumTitleLengthInstructors">[[admin/settings/post:restrictions.max-title-length-instructor]]</label>
+                        <input id="maximumTitleLengthInstructors" type="text" class="form-control" value="255" data-field="maximumTitleLengthInstructors">
                     </div>
                 </div>
                 <div class="col-xs-6">
@@ -55,7 +63,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="maximumPostLengthInstructors">[[admin/settings/post:restrictions.max-post-length-student]]</label>
+                        <label for="maximumPostLengthInstructors">[[admin/settings/post:restrictions.max-post-length-instructor]]</label>
                         <input id="maximumPostLengthInstructors" type="text" class="form-control" value="32767" data-field="maximumPostLengthInstructors">
                     </div>
                 </div>

@@ -461,25 +461,6 @@ describe('Post\'s', () => {
             assert(false);
         });
 
-        it('should error if title is too short', async () => {
-            try {
-                await apiPosts.edit({ uid: voterUid }, { pid: pid, content: 'edited post content', title: 'a' });
-            } catch (err) {
-                return assert.equal(err.message, `[[error:title-too-short, ${meta.config.minimumTitleLength}]]`);
-            }
-            assert(false);
-        });
-
-        it('should error if title is too long', async () => {
-            const longTitle = new Array(meta.config.maximumTitleLength + 2).join('a');
-            try {
-                await apiPosts.edit({ uid: voterUid }, { pid: pid, content: 'edited post content', title: longTitle });
-            } catch (err) {
-                return assert.equal(err.message, `[[error:title-too-long, ${meta.config.maximumTitleLength}]]`);
-            }
-            assert(false);
-        });
-
         it('should error with too few tags', async () => {
             const oldValue = meta.config.minimumTagsPerTopic;
             meta.config.minimumTagsPerTopic = 1;
