@@ -27,9 +27,13 @@ get:
                 type: boolean
               maintenanceMode:
                 type: boolean
-              minimumTitleLength:
+              minimumTitleLengthStudents:
                 type: number
-              maximumTitleLength:
+              maximumTitleLengthStudents:
+                type: number
+              minimumTitleLengthInstructors:
+                type: number
+              maximumTitleLengthInstructors:
                 type: number
               minimumPostLengthStudents:
                 type: number

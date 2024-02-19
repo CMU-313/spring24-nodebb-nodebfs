@@ -88,7 +88,13 @@ module.exports = function (Topics) {
         if (data.content) {
             data.content = utils.rtrim(data.content);
         }
-        Topics.checkTitle(data.title);
+        const u1 = await user.getUsersFields([uid], ['accounttype']);
+        if (u1[0].accounttype === 'student') {
+            Topics.checkTitle(data.title);
+        } else {
+            Topics.checkTitle2(data.title);
+        }
+
         await Topics.validateTags(data.tags, data.cid, uid);
         data.tags = await Topics.filterTags(data.tags, data.cid);
         if (!data.fromQueue) {
@@ -263,8 +269,18 @@ module.exports = function (Topics) {
         return postData;
     }
 
+    // type: function checkTitle(content: 'string') => object
+    // returns null, which is of type object
     Topics.checkTitle = function (title) {
-        check(title, meta.config.minimumTitleLength, meta.config.maximumTitleLength, 'title-too-short', 'title-too-long');
+        assert.equal(typeof (title), 'string');
+        check(title, meta.config.minimumTitleLengthStudents, meta.config.maximumTitleLengthStudents, 'title-too-short', 'title-too-long');
+    };
+
+    // type: function checkTitle2(content: 'string') => object
+    // returns null, which is of type object
+    Topics.checkTitle2 = function (title) {
+        assert.equal(typeof (title), 'string');
+        check(title, meta.config.minimumTitleLengthInstructors, meta.config.maximumTitleLengthInstructors, 'title-too-short', 'title-too-long');
     };
 
     // type: function checkContent(content: 'string') => object

@@ -52,13 +52,6 @@ postsAPI.edit = async function (caller, data) {
     if (!caller.uid) {
         throw new Error('[[error:not-logged-in]]');
     }
-    // Trim and remove HTML (latter for composers that send in HTML, like redactor)
-
-    if (data.title && data.title.length < meta.config.minimumTitleLength) {
-        throw new Error(`[[error:title-too-short, ${meta.config.minimumTitleLength}]]`);
-    } else if (data.title && data.title.length > meta.config.maximumTitleLength) {
-        throw new Error(`[[error:title-too-long, ${meta.config.maximumTitleLength}]]`);
-    }
     data.uid = caller.uid;
     data.req = apiHelpers.buildReqObject(caller);
     data.timestamp = parseInt(data.timestamp, 10) || Date.now();
