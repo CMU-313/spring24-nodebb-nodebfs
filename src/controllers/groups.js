@@ -73,10 +73,25 @@ groupsController.details = async function (req, res, next) {
     }
     groupData.isOwner = groupData.isOwner || isAdmin || (isGlobalMod && !groupData.system);
 
+    const postsAnonymous = posts.map(post => ({
+        ...post,
+        user: post.anonymous ?
+            {
+                uid: 0,
+                username: 'anonymous',
+                userslug: 'anonymous',
+                picture: null,
+                status: 'online',
+                displayname: 'Anonymous User',
+                'icon:text': 'A',
+                'icon:bgColor': '#3f51b5',
+            } : post.user,
+    }));
+
     res.render('groups/details', {
         title: `[[pages:group, ${groupData.displayName}]]`,
         group: groupData,
-        posts: posts,
+        posts: postsAnonymous,
         isAdmin: isAdmin,
         isGlobalMod: isGlobalMod,
         allowPrivateGroups: meta.config.allowPrivateGroups,
