@@ -120,7 +120,30 @@ topicsController.get = async function getTopic(req, res, next) {
         res.locals.linkTags.push(rel);
     });
 
-    res.render('topic', topicData);
+    const postsAnonymous = topicData.posts.map(post => ({
+        ...post,
+        uid: post.anonymous ? 0 : post.uid,
+        user: post.anonymous ?
+            {
+                uid: 0,
+                username: 'anonymous',
+                userslug: 'anonymous',
+                picture: null,
+                status: 'online',
+                displayname: 'Anonymous User',
+                'icon:text': 'A',
+                'icon:bgColor': '#3f51b5',
+            } : post.user,
+    }));
+
+    const replaceTopicData = {...topicData,
+        posts: postsAnonymous
+    };
+
+    res.render('topic', replaceTopicData);
+
+    console.log("HELLLLLLOOOOOOOO");
+    console.log(replaceTopicData);
 };
 
 function generateQueryString(query) {
