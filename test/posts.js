@@ -697,6 +697,14 @@ describe('Post\'s', () => {
                 done();
             });
         });
+
+        it('should get anonymous property', (done) => {
+            posts.getPostSummaryByPids([postData.pid], 0, {}, (err, data) => {
+                assert.ifError(err);
+                assert(data[0].anonymous);
+                done();
+            });
+        });
     });
 
     it('should get recent poster uids', (done) => {

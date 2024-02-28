@@ -3,6 +3,7 @@
 const validator = require('validator');
 const nconf = require('nconf');
 
+const assert = require('assert');
 const meta = require('../meta');
 const groups = require('../groups');
 const user = require('../user');
@@ -29,7 +30,16 @@ groupsController.list = async function (req, res) {
     });
 };
 
+
+// groupsController.details
+// req - request object
+// res - response object
+// next - pass control to middleware
 groupsController.details = async function (req, res, next) {
+    assert(typeof req === 'object');
+    assert(typeof res === 'object');
+    assert(typeof next === 'function');
+
     const lowercaseSlug = req.params.slug.toLowerCase();
     if (req.params.slug !== lowercaseSlug) {
         if (res.locals.isAPI) {
