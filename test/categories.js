@@ -111,6 +111,9 @@ describe('Categories', () => {
                 assert.ifError(err);
                 Categories.getRecentTopicReplies(categoryData, 0, {}, (err) => {
                     assert.ifError(err);
+                    console.log("categoryData: ", categoryData);
+                    console.log("type of categoryData: ", typeof categoryData);
+                    assert.strictEqual(typeof categoryData, 'object', "categoryData should have type object/array");
                     categoryData.forEach((category) => {
                         assert.strictEqual(typeof category.posts, 'object', "The 'posts' field must exist and be an object/array for each category");
                         if (category.posts.length > 0) {
