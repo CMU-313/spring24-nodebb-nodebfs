@@ -3,8 +3,8 @@
 const nconf = require('nconf');
 const _ = require('lodash');
 
-const categories = require('../categories');
 const assert = require('assert');
+const categories = require('../categories');
 const meta = require('../meta');
 const pagination = require('../pagination');
 const helpers = require('./helpers');
@@ -51,20 +51,20 @@ categoriesController.list = async function (req, res) {
         }
     });
 
-    data.categories.forEach(category => {
+    data.categories.forEach((category) => {
         if (category.posts && category.posts.length > 0) {
-            category.posts = category.posts.map(post => {
+            category.posts = category.posts.map((post) => {
                 const updatedUser = post.anonymous ?
-                {
-                    uid: 0,
-                    username: 'anonymous',
-                    userslug: 'anonymous',
-                    picture: null,
-                    status: 'online',
-                    displayname: 'Anonymous User',
-                    'icon:text': 'A',
-                    'icon:bgColor': '#673ab7',
-                } : post.user;
+                    {
+                        uid: 0,
+                        username: 'anonymous',
+                        userslug: 'anonymous',
+                        picture: null,
+                        status: 'online',
+                        displayname: 'Anonymous User',
+                        'icon:text': 'A',
+                        'icon:bgColor': '#673ab7',
+                    } : post.user;
 
                 return {
                     ...post,

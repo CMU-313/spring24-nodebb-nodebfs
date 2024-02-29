@@ -3,8 +3,8 @@
 
 const _ = require('lodash');
 
-const db = require('../database');
 const assert = require('assert');
+const db = require('../database');
 const meta = require('../meta');
 const user = require('../user');
 const posts = require('../posts');
