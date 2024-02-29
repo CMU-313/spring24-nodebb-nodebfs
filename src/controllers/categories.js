@@ -4,6 +4,7 @@ const nconf = require('nconf');
 const _ = require('lodash');
 
 const categories = require('../categories');
+const assert = require('assert');
 const meta = require('../meta');
 const pagination = require('../pagination');
 const helpers = require('./helpers');
@@ -11,7 +12,10 @@ const privileges = require('../privileges');
 
 const categoriesController = module.exports;
 
+// async function categoriesController.list(req: object, res: object)
 categoriesController.list = async function (req, res) {
+    assert(typeof req === 'object');
+    assert(typeof res === 'object');
     res.locals.metaTags = [{
         name: 'title',
         content: String(meta.config.title || 'NodeBB'),

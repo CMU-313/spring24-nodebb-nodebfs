@@ -111,6 +111,14 @@ describe('Categories', () => {
                 assert.ifError(err);
                 Categories.getRecentTopicReplies(categoryData, 0, {}, (err) => {
                     assert.ifError(err);
+                    categoryData.forEach((category) => {
+                        assert.strictEqual(typeof category.posts, 'object', "The 'posts' field must exist and be an object/array for each category");
+                        if (category.posts.length > 0) {
+                            category.posts.forEach((post) => {
+                                assert.ok('anonymous' in post, "Each post should have an 'anonymous' field.");
+                            });
+                        }
+                    });
                     done();
                 });
             });

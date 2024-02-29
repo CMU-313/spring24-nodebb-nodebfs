@@ -4,6 +4,7 @@
 const _ = require('lodash');
 
 const db = require('../database');
+const assert = require('assert');
 const meta = require('../meta');
 const user = require('../user');
 const posts = require('../posts');
@@ -11,7 +12,10 @@ const plugins = require('../plugins');
 const utils = require('../utils');
 
 module.exports = function (Topics) {
+    // async function Topics.getTeasers(topics: object, options: number)
     Topics.getTeasers = async function (topics, options) {
+        assert(typeof topics === 'object');
+        assert(typeof options === 'number');
         if (!Array.isArray(topics) || !topics.length) {
             return [];
         }
