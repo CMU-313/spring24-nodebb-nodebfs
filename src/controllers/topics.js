@@ -3,6 +3,7 @@
 const nconf = require('nconf');
 const qs = require('querystring');
 
+const assert = require('assert');
 const user = require('../user');
 const meta = require('../meta');
 const topics = require('../topics');
@@ -20,7 +21,11 @@ const url = nconf.get('url');
 const relative_path = nconf.get('relative_path');
 const upload_url = nconf.get('upload_url');
 
+// async function unvote(req: object, res: object, next: function)
 topicsController.get = async function getTopic(req, res, next) {
+    assert(typeof (req), 'object');
+    assert(typeof (res), 'object');
+    assert(typeof (next), 'function');
     const tid = req.params.topic_id;
 
     if (
@@ -120,7 +125,28 @@ topicsController.get = async function getTopic(req, res, next) {
         res.locals.linkTags.push(rel);
     });
 
-    res.render('topic', topicData);
+    const postsAnonymous = topicData.posts.map(post => ({
+        ...post,
+        uid: post.anonymous ? 0 : post.uid,
+        user: post.anonymous ?
+            {
+                uid: 0,
+                username: 'anonymous',
+                userslug: 'anonymous',
+                picture: null,
+                status: 'online',
+                displayname: 'Anonymous User',
+                'icon:text': 'A',
+                'icon:bgColor': '#3f51b5',
+            } : post.user,
+    }));
+
+    const replaceTopicData = {
+        ...topicData,
+        posts: postsAnonymous,
+    };
+
+    res.render('topic', replaceTopicData);
 };
 
 function generateQueryString(query) {
