@@ -43,7 +43,7 @@ module.exports = function (Topics) {
         });
 
         const [allPostData, callerSettings] = await Promise.all([
-            posts.getPostsFields(teaserPids, ['pid', 'uid', 'timestamp', 'tid', 'content']),
+            posts.getPostsFields(teaserPids, ['pid', 'uid', 'timestamp', 'tid', 'content', 'anonymous']),
             user.getSettings(uid),
         ]);
         let postData = allPostData.filter(post => post && post.pid);
@@ -67,6 +67,7 @@ module.exports = function (Topics) {
             post.user = users[post.uid];
             post.timestampISO = utils.toISOString(post.timestamp);
             tidToPost[post.tid] = post;
+            post.anonymous = post.anonymous === 'true';
         });
         await Promise.all(postData.map(p => posts.parsePost(p)));
 
@@ -88,6 +89,8 @@ module.exports = function (Topics) {
         });
 
         const result = await plugins.hooks.fire('filter:teasers.get', { teasers: teasers, uid: uid });
+        console.log("src/topics/teaser.js result.teasers", result.teasers);
+        console.log("src/topics/teaser.js result.teasers.posts", result.teasers.posts);
         return result.teasers;
     };
 

@@ -331,6 +331,7 @@ async function generateForCategoryRecentPosts(req, res) {
     const topicsPerPage = 20;
     const start = Math.max(0, (page - 1) * topicsPerPage);
     const stop = start + topicsPerPage - 1;
+    console.log("in src/routes/feeds.js about to call categories.getRecentReplies, which calls posts.getPostSummaryByPids");
     const [userPrivileges, category, postData] = await Promise.all([
         privileges.categories.get(cid, req.uid),
         categories.getCategoryData(cid),

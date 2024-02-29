@@ -13,6 +13,7 @@ const batch = require('../batch');
 
 module.exports = function (Categories) {
     Categories.getRecentReplies = async function (cid, uid, start, stop) {
+        console.log("in src/categories/recentreplies.js Categories.getRecentReplies");
         // backwards compatibility, treat start as count
         if (stop === undefined && start > 0) {
             winston.warn('[Categories.getRecentReplies] 3 params deprecated please use Categories.getRecentReplies(cid, uid, start, stop)');
@@ -67,6 +68,9 @@ module.exports = function (Categories) {
     };
 
     Categories.getRecentTopicReplies = async function (categoryData, uid, query) {
+        console.log("src/categories/recentreplies.js getRecentTopicReplies categoryData: ", categoryData);
+        console.log("src/categories/recentreplies.js getRecentTopicReplies uid: ", uid);
+        console.log("src/categories/recentreplies.js getRecentTopicReplies query: ", query);
         if (!Array.isArray(categoryData) || !categoryData.length) {
             return;
         }
@@ -99,12 +103,15 @@ module.exports = function (Categories) {
         const topicData = await topics.getTopicsFields(
             tids,
             ['tid', 'mainPid', 'slug', 'title', 'teaserPid', 'cid', 'postcount']
+            // ['tid', 'mainPid', 'slug', 'title', 'teaserPid', 'cid', 'postcount', 'posts', 'anonymous']
         );
+        console.log("src/categories/recentreplies.js just got topicData", topicData);
         topicData.forEach((topic) => {
             if (topic) {
                 topic.teaserPid = topic.teaserPid || topic.mainPid;
             }
         });
+        console.log("src/categories/recentreplies.js foreach done on topicData", topicData);
         const cids = _.uniq(topicData.map(t => t && t.cid).filter(cid => parseInt(cid, 10)));
         const getToRoot = async () => await Promise.all(cids.map(Categories.getParentCids));
         const [toRoot, teasers] = await Promise.all([
@@ -112,7 +119,7 @@ module.exports = function (Categories) {
             topics.getTeasers(topicData, uid),
         ]);
         const cidToRoot = _.zipObject(cids, toRoot);
-
+        console.log("src/categories/recentreplies.js right before teasers.forEach topicData", topicData);
         teasers.forEach((teaser, index) => {
             if (teaser) {
                 teaser.cid = topicData[index].cid;
@@ -123,8 +130,10 @@ module.exports = function (Categories) {
                     slug: topicData[index].slug,
                     title: topicData[index].title,
                 };
+                // teaser.anonymous = topicData[index].posts.length > 0 ? topicData[index].posts[0].anonymous : false;
             }
         });
+        console.log("src/categories/recentreplies.js teasers", teasers);
         return teasers.filter(Boolean);
     }
 
@@ -174,8 +183,8 @@ module.exports = function (Categories) {
         ]);
 
         await batch.processArray(pids, async (pids) => {
-            const postData = await posts.getPostsFields(pids, ['pid', 'deleted', 'uid', 'timestamp', 'upvotes', 'downvotes']);
-
+            const postData = await posts.getPostsFields(pids, ['pid', 'deleted', 'uid', 'timestamp', 'upvotes', 'downvotes', 'anonymous']);
+            console.log("src/categories/recentreplies.js moveRecentreplies postData immediate", postData);
             const bulkRemove = [];
             const bulkAdd = [];
             postData.forEach((post) => {

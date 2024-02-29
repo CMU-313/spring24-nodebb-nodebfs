@@ -17,7 +17,10 @@ const intFields = [
 
 module.exports = function (Topics) {
     Topics.getTopicsFields = async function (tids, fields) {
+        console.log("src/topics/data.js input tids", tids);
+        console.log("src/topics/data.js input fields", fields);
         if (!Array.isArray(tids) || !tids.length) {
+            console.log("src/topics/data.js returning []");
             return [];
         }
 
@@ -35,6 +38,8 @@ module.exports = function (Topics) {
             keys: keys,
         });
         result.topics.forEach(topic => modifyTopic(topic, fields));
+        console.log("src/topics/data.js result", result);
+        console.log("src/topics/data.js result.topics (returned)", result.topics);
         return result.topics;
     };
 

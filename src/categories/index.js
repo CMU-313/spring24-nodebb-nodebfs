@@ -353,6 +353,7 @@ Categories.getTree = function (categories, parentCid) {
     sortTree(tree);
 
     categories.forEach(c => calculateTopicPostCount(c));
+    console.log("src/categories/index.js getTree tree is ", tree);
     return tree;
 };
 
