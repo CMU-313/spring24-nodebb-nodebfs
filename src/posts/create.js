@@ -73,22 +73,40 @@ module.exports = function (Posts) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         const topicData = yield topics.getTopicFields(tid, ['cid', 'pinned']);
         postData.cid = topicData.cid;
-        yield Promise.all([
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            db.sortedSetAdd('posts:pid', timestamp, postData.pid),
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            db.incrObjectField('global', 'postCount'),
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-            user.onNewPostMade(postData),
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-            topics.onNewPostMade(postData),
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-            categories.onNewPostMade(topicData.cid, topicData.pinned, postData),
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-            groups.onNewPostMade(postData),
-            addReplyTo(postData, timestamp),
-            Posts.uploads.sync(postData.pid),
-        ]);
+        if (isAnon === true) {
+            yield Promise.all([
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                db.sortedSetAdd('posts:pid', timestamp, postData.pid),
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
+                db.incrObjectField('global', 'postCount'),
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+                topics.onNewPostMade(postData),
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+                categories.onNewPostMade(topicData.cid, topicData.pinned, postData),
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+                groups.onNewPostMade(postData),
+                addReplyTo(postData, timestamp),
+                Posts.uploads.sync(postData.pid),
+            ]);
+        }
+        else {
+            yield Promise.all([
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                db.sortedSetAdd('posts:pid', timestamp, postData.pid),
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
+                db.incrObjectField('global', 'postCount'),
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+                user.onNewPostMade(postData),
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+                topics.onNewPostMade(postData),
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+                categories.onNewPostMade(topicData.cid, topicData.pinned, postData),
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+                groups.onNewPostMade(postData),
+                addReplyTo(postData, timestamp),
+                Posts.uploads.sync(postData.pid),
+            ]);
+        }
         result = (yield plugins.hooks.fire('filter:post.get', { post: postData, uid: data.uid }));
         result.post.isMain = isMain;
         plugins.hooks.fire('action:post.save', { post: _.clone(result.post) }).catch((e) => console.error(e));
