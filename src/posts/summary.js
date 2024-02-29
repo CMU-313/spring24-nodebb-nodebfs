@@ -4,6 +4,7 @@
 const validator = require('validator');
 const _ = require('lodash');
 
+const assert = require('assert');
 const topics = require('../topics');
 const user = require('../user');
 const plugins = require('../plugins');
@@ -11,7 +12,15 @@ const categories = require('../categories');
 const utils = require('../utils');
 
 module.exports = function (Posts) {
+    // Posts.getPostSummaryByPids
+    // pids - array of post ids
+    // uid - user id
+    // options - object of different post options
+    // returns list of post summaries
     Posts.getPostSummaryByPids = async function (pids, uid, options) {
+        assert(typeof pids === 'object');
+        assert(typeof uid === 'number');
+        assert(typeof options === 'object');
         if (!Array.isArray(pids) || !pids.length) {
             return [];
         }
@@ -20,7 +29,7 @@ module.exports = function (Posts) {
         options.parse = options.hasOwnProperty('parse') ? options.parse : true;
         options.extraFields = options.hasOwnProperty('extraFields') ? options.extraFields : [];
 
-        const fields = ['pid', 'tid', 'content', 'uid', 'timestamp', 'deleted', 'upvotes', 'downvotes', 'replies', 'handle'].concat(options.extraFields);
+        const fields = ['pid', 'tid', 'content', 'uid', 'timestamp', 'deleted', 'upvotes', 'downvotes', 'replies', 'handle', 'anonymous'].concat(options.extraFields);
 
         let posts = await Posts.getPostsFields(pids, fields);
         posts = posts.filter(Boolean);
@@ -58,6 +67,8 @@ module.exports = function (Posts) {
 
         posts = await parsePosts(posts, options);
         const result = await plugins.hooks.fire('filter:post.getPostSummaryByPids', { posts: posts, uid: uid });
+
+        assert(typeof result.posts === 'object');
         return result.posts;
     };
 

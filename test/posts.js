@@ -30,6 +30,7 @@ describe('Post\'s', () => {
     let globalModUid;
     let postData;
     let topicData;
+    let anonymousPostData;
     let cid;
 
     before((done) => {
@@ -64,6 +65,7 @@ describe('Post\'s', () => {
                 cid: results.category.cid,
                 title: 'Test Topic Title',
                 content: 'The content of test topic',
+                anonymous: false,
             }, (err, data) => {
                 if (err) {
                     return done(err);
@@ -72,6 +74,19 @@ describe('Post\'s', () => {
                 topicData = data.topicData;
 
                 groups.join('Global Moderators', globalModUid, done);
+            });
+            topics.post({
+                uid: results.voteeUid,
+                cid: results.category.cid,
+                title: 'Test Topic Title',
+                content: 'The content of test topic',
+                anonymous: true,
+            }, (err, data) => {
+                if (err) {
+                    return done(err);
+                }
+                anonymousPostData = data.postData;
+                topicData = data.topicData;
             });
         });
     });
@@ -762,6 +777,32 @@ describe('Post\'s', () => {
                 assert(data[0].user);
                 assert(data[0].topic);
                 assert(data[0].category);
+                done();
+            });
+        });
+
+        it('should get anonymous property when post is non anonymous', (done) => {
+            posts.getPostSummaryByPids([postData.pid], 0, {}, (err, data) => {
+                assert.ifError(err);
+                assert(data[0].hasOwnProperty('anonymous'));
+                if (typeof data[0].anonymous === 'string') {
+                    assert.equal(data[0].anonymous, 'false');
+                } else {
+                    assert.equal(data[0].anonymous, false);
+                }
+                done();
+            });
+        });
+
+        it('should get anonymous property when post is anonymous', (done) => {
+            posts.getPostSummaryByPids([anonymousPostData.pid], 0, {}, (err, data) => {
+                assert.ifError(err);
+                assert(data[0].hasOwnProperty('anonymous'));
+                if (typeof data[0].anonymous === 'string') {
+                    assert.equal(data[0].anonymous, 'true');
+                } else {
+                    assert.equal(data[0].anonymous, true);
+                }
                 done();
             });
         });

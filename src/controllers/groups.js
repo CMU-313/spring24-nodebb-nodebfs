@@ -3,6 +3,7 @@
 const validator = require('validator');
 const nconf = require('nconf');
 
+const assert = require('assert');
 const meta = require('../meta');
 const groups = require('../groups');
 const user = require('../user');
@@ -29,7 +30,16 @@ groupsController.list = async function (req, res) {
     });
 };
 
+
+// groupsController.details
+// req - request object
+// res - response object
+// next - pass control to middleware
 groupsController.details = async function (req, res, next) {
+    assert(typeof req === 'object');
+    assert(typeof res === 'object');
+    assert(typeof next === 'function');
+
     const lowercaseSlug = req.params.slug.toLowerCase();
     if (req.params.slug !== lowercaseSlug) {
         if (res.locals.isAPI) {
@@ -73,10 +83,25 @@ groupsController.details = async function (req, res, next) {
     }
     groupData.isOwner = groupData.isOwner || isAdmin || (isGlobalMod && !groupData.system);
 
+    const postsAnonymous = posts.map(post => ({
+        ...post,
+        user: post.anonymous ?
+            {
+                uid: 0,
+                username: 'anonymous',
+                userslug: 'anonymous',
+                picture: null,
+                status: 'online',
+                displayname: 'Anonymous User',
+                'icon:text': 'A',
+                'icon:bgColor': '#3f51b5',
+            } : post.user,
+    }));
+
     res.render('groups/details', {
         title: `[[pages:group, ${groupData.displayName}]]`,
         group: groupData,
-        posts: posts,
+        posts: postsAnonymous,
         isAdmin: isAdmin,
         isGlobalMod: isGlobalMod,
         allowPrivateGroups: meta.config.allowPrivateGroups,
