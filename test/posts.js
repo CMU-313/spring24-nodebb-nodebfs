@@ -87,8 +87,6 @@ describe('Post\'s', () => {
                 }
                 anonymousPostData = data.postData;
                 topicData = data.topicData;
-
-                groups.join('Global Moderators', globalModUid, done);
             });
         });
     });
