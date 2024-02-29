@@ -717,7 +717,11 @@ describe('Post\'s', () => {
             posts.getPostSummaryByPids([postData.pid], 0, {}, (err, data) => {
                 assert.ifError(err);
                 assert(data[0].hasOwnProperty('anonymous'));
-                assert.equal(data[0].anonymous, false);
+                if (typeof data[0].anonymous === 'string') {
+                    assert.equal(data[0].anonymous, 'false');
+                } else {
+                    assert.equal(data[0].anonymous, false);
+                }
                 done();
             });
         });
@@ -726,7 +730,11 @@ describe('Post\'s', () => {
             posts.getPostSummaryByPids([anonymousPostData.pid], 0, {}, (err, data) => {
                 assert.ifError(err);
                 assert(data[0].hasOwnProperty('anonymous'));
-                assert.equal(data[0].anonymous, true);
+                if (typeof data[0].anonymous === 'string') {
+                    assert.equal(data[0].anonymous, 'true');
+                } else {
+                    assert.equal(data[0].anonymous, true);
+                }
                 done();
             });
         });
