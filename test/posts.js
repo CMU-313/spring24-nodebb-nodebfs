@@ -716,7 +716,8 @@ describe('Post\'s', () => {
         it('should get anonymous property when post is non anonymous', (done) => {
             posts.getPostSummaryByPids([postData.pid], 0, {}, (err, data) => {
                 assert.ifError(err);
-                assert.strictEqual(data[0].anonymous, false);
+                assert(data[0].hasOwnProperty('anonymous'));
+                assert.strictEqual(Boolean(data[0].anonymous), false);
                 done();
             });
         });
@@ -724,7 +725,8 @@ describe('Post\'s', () => {
         it('should get anonymous property when post is anonymous', (done) => {
             posts.getPostSummaryByPids([anonymousPostData.pid], 0, {}, (err, data) => {
                 assert.ifError(err);
-                assert.strictEqual(data[0].anonymous, true);
+                assert(data[0].hasOwnProperty('anonymous'));
+                assert.strictEqual(Boolean(data[0].anonymous), true);
                 done();
             });
         });
