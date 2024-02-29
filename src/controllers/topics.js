@@ -141,8 +141,9 @@ topicsController.get = async function getTopic(req, res, next) {
             } : post.user,
     }));
 
-    const replaceTopicData = {...topicData,
-        posts: postsAnonymous
+    const replaceTopicData = {
+        ...topicData,
+        posts: postsAnonymous,
     };
 
     res.render('topic', replaceTopicData);

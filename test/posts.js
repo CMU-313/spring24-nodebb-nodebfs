@@ -230,6 +230,7 @@ describe('Post\'s', () => {
             assert.equal(data.downvoted, false);
         });
 
+        
         it('should downvote a post', async () => {
             const result = await apiPosts.downvote({ uid: voterUid }, { pid: postData.pid, room_id: 'topic_1' });
             assert.equal(result.post.upvotes, 0);
