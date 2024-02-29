@@ -89,8 +89,6 @@ module.exports = function (Topics) {
         });
 
         const result = await plugins.hooks.fire('filter:teasers.get', { teasers: teasers, uid: uid });
-        console.log("src/topics/teaser.js result.teasers", result.teasers);
-        console.log("src/topics/teaser.js result.teasers.posts", result.teasers.posts);
         return result.teasers;
     };
 

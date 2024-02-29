@@ -19,7 +19,6 @@ categoriesController.list = async function (req, res) {
         property: 'og:type',
         content: 'website',
     }];
-    console.log("src/controllers/categories.js req.query", req.query);
     const allRootCids = await categories.getAllCidsFromSet('cid:0:children');
     const rootCids = await privileges.categories.filterCids('find', allRootCids, req.uid);
     const pageCount = Math.max(1, Math.ceil(rootCids.length / meta.config.categoriesPerPage));
@@ -47,16 +46,10 @@ categoriesController.list = async function (req, res) {
             helpers.setCategoryTeaser(category);
         }
     });
-    // console.log("src/controllers/categories.js data after trim and category teaser set", data);
-    // console.log("src/controllers/categories.js General Discussion data.posts", data.categories[1].posts);
-    // console.log("src/controllers/categories.js General Discussion data.teaser", data.categories[1].teaser);
-    // console.log("src/controllers/categories.js Comments Feedback data.posts", data.categories[2].posts);
-    // console.log("src/controllers/categories.js Comments Feedback data.teaser", data.categories[2].teaser);
-    // console.log("src/controllers/categories.js Announcements data.posts", data.categories[0].posts);
+
     data.categories.forEach(category => {
         if (category.posts && category.posts.length > 0) {
             category.posts = category.posts.map(post => {
-                // Directly create an updated user object for anonymity
                 const updatedUser = post.anonymous ?
                 {
                     uid: 0,
@@ -69,7 +62,6 @@ categoriesController.list = async function (req, res) {
                     'icon:bgColor': '#673ab7',
                 } : post.user;
 
-                // Return the post with the updated user object
                 return {
                     ...post,
                     user: updatedUser,
@@ -77,20 +69,6 @@ categoriesController.list = async function (req, res) {
             });
         }
     });
-
-    // Debug: Log a specific post to verify changes
-    // console.log(data.categories[1].posts[0]);
-
-
-
-    // Log the updated data structure to verify the changes
-    // console.log(JSON.stringify(data, null, 2));
-    console.log("src/controllers/categories.js General Discussion data.posts", data.categories[1].posts);
-    console.log("src/controllers/categories.js Comments Feedback data.posts", data.categories[2].posts);
-    console.log("src/controllers/categories.js General Discussion data.teaser", data.categories[1].teaser);
-    console.log("src/controllers/categories.js Comments Feedback data.teaser", data.categories[2].teaser);
-    console.log("src/controllers/categories.js data after anon edit", data);
-
 
     if (req.originalUrl.startsWith(`${nconf.get('relative_path')}/api/categories`) || req.originalUrl.startsWith(`${nconf.get('relative_path')}/categories`)) {
         data.title = '[[pages:categories]]';
