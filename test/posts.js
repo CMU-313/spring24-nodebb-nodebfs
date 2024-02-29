@@ -461,6 +461,74 @@ describe('Post\'s', () => {
             assert(false);
         });
 
+        it('should error if title is too short for students', async () => {
+            try {
+                await apiPosts.edit({ uid: voterUid }, { pid: pid, content: 'edited post content', title: 'a' });
+            } catch (err) {
+                return assert.equal(err.message, `[[error:title-too-short, ${meta.config.minimumTitleLengthStudents}]]`);
+            }
+        });
+
+        it('should error if title is too long for students', async () => {
+            const longTitle = new Array(meta.config.maximumTitleLengthStudents + 2).join('a');
+            try {
+                await apiPosts.edit({ uid: voterUid }, { pid: pid, content: 'edited post content', title: longTitle });
+            } catch (err) {
+                return assert.equal(err.message, `[[error:title-too-long, ${meta.config.maximumTitleLengthStudents}]]`);
+            }
+        });
+
+        it('should error if title is too short for instructors', async () => {
+            try {
+                await apiPosts.edit({ uid: voterUid }, { pid: pid, content: 'edited post content', title: 'a' });
+            } catch (err) {
+                return assert.equal(err.message, `[[error:title-too-short, ${meta.config.minimumTitleLengthInstructors}]]`);
+            }
+        });
+
+        it('should error if title is too long for instructors', async () => {
+            const longTitle = new Array(meta.config.maximumTitleLengthInstructors + 2).join('a');
+            try {
+                await apiPosts.edit({ uid: voterUid }, { pid: pid, content: 'edited post content', title: longTitle });
+            } catch (err) {
+                return assert.equal(err.message, `[[error:title-too-long, ${meta.config.maximumTitleLengthInstructors}]]`);
+            }
+        });
+
+        it('should error if content is too short for students', async () => {
+            try {
+                await apiPosts.edit({ uid: voterUid }, { pid: pid, content: 'e' });
+            } catch (err) {
+                return assert.equal(err.message, `[[error:content-too-short, ${meta.config.minimumPostLengthStudents}]]`);
+            }
+        });
+
+        it('should error if content is too long for students', async () => {
+            const longContent = new Array(meta.config.maximumPostLengthStudents + 2).join('a');
+            try {
+                await apiPosts.edit({ uid: voterUid }, { pid: pid, content: longContent });
+            } catch (err) {
+                return assert.equal(err.message, `[[error:content-too-long, ${meta.config.maximumPostLengthStudents}]]`);
+            }
+        });
+
+        it('should error if content is too short for instructors', async () => {
+            try {
+                await apiPosts.edit({ uid: voterUid }, { pid: pid, content: 'e' });
+            } catch (err) {
+                return assert.equal(err.message, `[[error:content-too-short, ${meta.config.minimumPostLengthInstructors}]]`);
+            }
+        });
+
+        it('should error if content is too long for instructors', async () => {
+            const longContent = new Array(meta.config.maximumPostLengthInstructors + 2).join('a');
+            try {
+                await apiPosts.edit({ uid: voterUid }, { pid: pid, content: longContent });
+            } catch (err) {
+                return assert.equal(err.message, `[[error:content-too-long, ${meta.config.maximumPostLengthInstructors}]]`);
+            }
+        });
+
         it('should error with too few tags', async () => {
             const oldValue = meta.config.minimumTagsPerTopic;
             meta.config.minimumTagsPerTopic = 1;
