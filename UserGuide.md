@@ -44,4 +44,11 @@ Automated tests in spring24-nodebb-nodebfs/test/user.js. The tests attempt to ma
 
 Automated tests in spring24-nodebb-nodebfs/test/posts.js. To test that the anonymous feature is passed in properly, we use tests in the post summary to see if the anonymous property is actually included in the information shown to the front-end. We also modify existing tests and schemas to ensure that the property is passed in. These automated tests make sure that the backend actually stores anonymous properties. Along with visual confirmation on the group page, these tests show that the anonymous feature is working properly.
 
+### Using and testing the hiding of anonymous posts in Categories.
+- Log in as either a student or an instructor.
+- From the home page, select one of the Categories. Default options are Announcements, General Discussion, Comments & Feedback, or Blogs.
+- Once in the Category, make a non-anonymous topic and click either Categories or the NodeBB logo. The new topic you just made should show up in the right next to the category you made your new topic in. When you hover over the profile icon of the user that made the post, you will see their username (i.e. your username in this case).
+- Select a Category (the same category or a different category both work).
+- Once in the Category, make an anonymous topic and click either Categories or the NodeBB logo. The new topic you just made should show up in the right next to the category you made your new topic in. When you hover over the profile icon of the user that made the post, you will see “anonymous” instead of the user’s username.
 
+Automated tests in spring24-nodebb-nodebfs/test/categories.js. The test looks through the structure of the categories, topics, and posts created by the existing tests to verify the existence and type of the anonymous field.
