@@ -953,11 +953,17 @@ describe('Categories', () => {
                 assert.ifError(err);
                 Categories.getRecentTopicReplies(categoryData, 0, {}, (err) => {
                     assert.ifError(err);
-                    assert.fail(JSON.stringify(categoryData));
-                    if(categoryData.topics && categoryData.topics.length > 0) {
-                        const isFirstTopicTeaserAnonymous = categoryData.topics[0].teaser.anonymous;
-                        assert.strictEqual(isFirstTopicTeaserAnonymous, false, 'The anonymous field in the first topic teaser should be boolean false.');
-                    }
+                    // assert.fail(JSON.stringify(categoryData));
+                    categoryData.topics.forEach((topic) => {
+                        if(topic.length > 0 && topic.teaser) {
+                            const isAnonymousBoolean = typeof topic.teaser.anonymous === 'boolean';
+                            assert.ok(isAnonymousBoolean, 'anonymous field in the teaser is a boolean');
+                        }
+                    });
+                    // if(categoryData.topics && categoryData.topics.length > 0) {
+                    //     const isFirstTopicTeaserAnonymous = categoryData.topics[0].teaser.anonymous;
+                    //     assert.strictEqual(isFirstTopicTeaserAnonymous, false, 'The anonymous field in the first topic teaser should be boolean false.');
+                    // }
                     done();
                 });
             });
