@@ -100,11 +100,13 @@ module.exports = function (Categories) {
             tids,
             ['tid', 'mainPid', 'slug', 'title', 'teaserPid', 'cid', 'postcount']
         );
+
         topicData.forEach((topic) => {
             if (topic) {
                 topic.teaserPid = topic.teaserPid || topic.mainPid;
             }
         });
+
         const cids = _.uniq(topicData.map(t => t && t.cid).filter(cid => parseInt(cid, 10)));
         const getToRoot = async () => await Promise.all(cids.map(Categories.getParentCids));
         const [toRoot, teasers] = await Promise.all([
@@ -112,7 +114,6 @@ module.exports = function (Categories) {
             topics.getTeasers(topicData, uid),
         ]);
         const cidToRoot = _.zipObject(cids, toRoot);
-
         teasers.forEach((teaser, index) => {
             if (teaser) {
                 teaser.cid = topicData[index].cid;
@@ -125,6 +126,7 @@ module.exports = function (Categories) {
                 };
             }
         });
+
         return teasers.filter(Boolean);
     }
 
@@ -175,7 +177,6 @@ module.exports = function (Categories) {
 
         await batch.processArray(pids, async (pids) => {
             const postData = await posts.getPostsFields(pids, ['pid', 'deleted', 'uid', 'timestamp', 'upvotes', 'downvotes']);
-
             const bulkRemove = [];
             const bulkAdd = [];
             postData.forEach((post) => {

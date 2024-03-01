@@ -3,6 +3,7 @@
 const nconf = require('nconf');
 const _ = require('lodash');
 
+const assert = require('assert');
 const categories = require('../categories');
 const meta = require('../meta');
 const pagination = require('../pagination');
@@ -11,7 +12,10 @@ const privileges = require('../privileges');
 
 const categoriesController = module.exports;
 
+// async function categoriesController.list(req: object, res: object)
 categoriesController.list = async function (req, res) {
+    assert(typeof req === 'object');
+    assert(typeof res === 'object');
     res.locals.metaTags = [{
         name: 'title',
         content: String(meta.config.title || 'NodeBB'),
@@ -19,7 +23,6 @@ categoriesController.list = async function (req, res) {
         property: 'og:type',
         content: 'website',
     }];
-
     const allRootCids = await categories.getAllCidsFromSet('cid:0:children');
     const rootCids = await privileges.categories.filterCids('find', allRootCids, req.uid);
     const pageCount = Math.max(1, Math.ceil(rootCids.length / meta.config.categoriesPerPage));
@@ -45,6 +48,29 @@ categoriesController.list = async function (req, res) {
         if (category) {
             helpers.trimChildren(category);
             helpers.setCategoryTeaser(category);
+        }
+    });
+
+    data.categories.forEach((category) => {
+        if (category.posts && category.posts.length > 0) {
+            category.posts = category.posts.map((post) => {
+                const updatedUser = post.anonymous ?
+                    {
+                        uid: 0,
+                        username: 'anonymous',
+                        userslug: 'anonymous',
+                        picture: null,
+                        status: 'online',
+                        displayname: 'Anonymous User',
+                        'icon:text': 'A',
+                        'icon:bgColor': '#673ab7',
+                    } : post.user;
+
+                return {
+                    ...post,
+                    user: updatedUser,
+                };
+            });
         }
     });
 
