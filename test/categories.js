@@ -111,6 +111,7 @@ describe('Categories', () => {
                 assert.ifError(err);
                 Categories.getRecentTopicReplies(categoryData, 0, {}, (err) => {
                     assert.ifError(err);
+                    assert.fail(JSON.stringify(categoryData));
                     assert.ok(Array.isArray(categoryData), 'categoryData should be an array');
                     categoryData.forEach((category) => {
                         assert.strictEqual(typeof category.posts, 'object', "The 'posts' field must exist and be an object/array for each category");
