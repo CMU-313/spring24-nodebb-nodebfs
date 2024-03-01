@@ -117,58 +117,6 @@ describe('Categories', () => {
         });
     });
 
-    describe('anonymous Categories.getRecentTopicReplies', () => {
-        let anonCid;
-        let anonTid;
-        before((done) => {
-            async.parallel({
-                category: function (next) {
-                    Categories.create({
-                        name: 'Test Category 1.5',
-                        description: 'Test category created by testing script for anonymous',
-                    }, next);
-                },
-                topic: function (next) {
-                    Topics.post({
-                        uid: posterUid,
-                        cid: categoryObj.cid,
-                        title: 'Test Topic Title',
-                        content: 'The content of anonymous test topic',
-                    }, next);
-                },
-            }, (err, results) => {
-                if (err) {
-                    return done(err);
-                }
-                anonCid = results.category.cid;
-                anonTid = results.topic.topicData.tid;
-                Topics.reply({ uid: posterUid, content: 'test post', tid: anonTid }, (err) => {
-                    done(err);
-                });
-            });
-        });
-
-        it('should add a post and find anonymous upon retrieval', (done) => {
-            Categories.getCategoryById({
-                cid: categoryObj.cid,
-                set: `cid:${categoryObj.cid}:tids`,
-                reverse: true,
-                start: 0,
-                stop: -1,
-                uid: 0,
-            }, (err, categoryData) => {
-                assert.ifError(err);
-                Categories.getRecentTopicReplies(categoryData, 0, {}, (err) => {
-                    assert.ifError(err);
-                    assert.ok(categoryData.topics && categoryData.topics.length > 0, 'There should be at least one topic.');
-                    const isFirstTopicTeaserAnonymous = categoryData.topics[0].teaser.anonymous;
-                    assert.strictEqual(isFirstTopicTeaserAnonymous, false, 'The anonymous field in the first topic teaser should be boolean false.');
-                });
-                done();
-            });
-        });
-    });
-
     describe('.getCategoryTopics', () => {
         it('should return a list of topics', (done) => {
             Categories.getCategoryTopics({
@@ -962,5 +910,57 @@ describe('Categories', () => {
         });
         assert.strictEqual(child1.cid, data.children[0].cid);
         assert.strictEqual(child2.cid, data.children[0].children[0].cid);
+    });
+
+    describe('anonymous Categories.getRecentTopicReplies', () => {
+        let anonCid;
+        let anonTid;
+        before((done) => {
+            async.parallel({
+                category: function (next) {
+                    Categories.create({
+                        name: 'Test Category 1.5',
+                        description: 'Test category created by testing script for anonymous',
+                    }, next);
+                },
+                topic: function (next) {
+                    Topics.post({
+                        uid: posterUid,
+                        cid: categoryObj.cid,
+                        title: 'Test Topic Title',
+                        content: 'The content of anonymous test topic',
+                    }, next);
+                },
+            }, (err, results) => {
+                if (err) {
+                    return done(err);
+                }
+                anonCid = results.category.cid;
+                anonTid = results.topic.topicData.tid;
+                Topics.reply({ uid: posterUid, content: 'test post', tid: anonTid }, (err) => {
+                    done(err);
+                });
+            });
+        });
+
+        it('should add a post and find anonymous upon retrieval', (done) => {
+            Categories.getCategoryById({
+                cid: categoryObj.cid,
+                set: `cid:${categoryObj.cid}:tids`,
+                reverse: true,
+                start: 0,
+                stop: -1,
+                uid: 0,
+            }, (err, categoryData) => {
+                assert.ifError(err);
+                Categories.getRecentTopicReplies(categoryData, 0, {}, (err) => {
+                    assert.ifError(err);
+                    assert.ok(categoryData.topics && categoryData.topics.length > 0, 'There should be at least one topic.');
+                    const isFirstTopicTeaserAnonymous = categoryData.topics[0].teaser.anonymous;
+                    assert.strictEqual(isFirstTopicTeaserAnonymous, false, 'The anonymous field in the first topic teaser should be boolean false.');
+                });
+                done();
+            });
+        });
     });
 });
