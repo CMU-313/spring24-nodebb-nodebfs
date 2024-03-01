@@ -913,33 +913,33 @@ describe('Categories', () => {
     });
 
     describe('anonymous Categories.getRecentTopicReplies', () => {
-        let anonCid;
-        let anonTid;
-        before((done) => {
-            async.parallel({
-                category: function (next) {
-                    Categories.create({
-                        name: 'Test Category 1.5',
-                        description: 'Test category created by testing script for anonymous',
-                    }, next);
-                },
-                topic: function (next) {
-                    Topics.post({
-                        uid: posterUid,
-                        cid: categoryObj.cid,
-                        title: 'Test Topic Title',
-                        content: 'The content of anonymous test topic',
-                    }, next);
-                },
-            }, (err, results) => {
-                if (err) {
-                    return done(err);
-                }
-                anonCid = results.category.cid;
-                anonTid = results.topic.topicData.tid;
-                Topics.reply({ uid: posterUid, content: 'test post', tid: anonTid }, done);
-            });
-        });
+        // let anonCid;
+        // let anonTid;
+        // before((done) => {
+        //     async.parallel({
+        //         category: function (next) {
+        //             Categories.create({
+        //                 name: 'Test Category 1.5',
+        //                 description: 'Test category created by testing script for anonymous',
+        //             }, next);
+        //         },
+        //         topic: function (next) {
+        //             Topics.post({
+        //                 uid: posterUid,
+        //                 cid: categoryObj.cid,
+        //                 title: 'Test Topic Title',
+        //                 content: 'The content of anonymous test topic',
+        //             }, next);
+        //         },
+        //     }, (err, results) => {
+        //         if (err) {
+        //             return done(err);
+        //         }
+        //         anonCid = results.category.cid;
+        //         anonTid = results.topic.topicData.tid;
+        //         Topics.reply({ uid: posterUid, content: 'test post', tid: anonTid }, done);
+        //     });
+        // });
 
         it('should add a post and find anonymous upon retrieval', (done) => {
             Categories.getCategoryById({
