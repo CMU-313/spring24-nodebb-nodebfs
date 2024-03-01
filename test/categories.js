@@ -945,8 +945,8 @@ describe('Categories', () => {
 
         it('should add a post and find anonymous upon retrieval', (done) => {
             Categories.getCategoryById({
-                cid: categoryObj.cid,
-                set: `cid:${categoryObj.cid}:tids`,
+                cid: anonCid,
+                set: `cid:${anonCid}:tids`,
                 reverse: true,
                 start: 0,
                 stop: -1,
@@ -958,8 +958,8 @@ describe('Categories', () => {
                     assert.ok(categoryData.topics && categoryData.topics.length > 0, 'There should be at least one topic.');
                     const isFirstTopicTeaserAnonymous = categoryData.topics[0].teaser.anonymous;
                     assert.strictEqual(isFirstTopicTeaserAnonymous, false, 'The anonymous field in the first topic teaser should be boolean false.');
+                    done();
                 });
-                done();
             });
         });
     });
