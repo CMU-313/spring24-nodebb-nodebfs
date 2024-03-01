@@ -937,9 +937,7 @@ describe('Categories', () => {
                 }
                 anonCid = results.category.cid;
                 anonTid = results.topic.topicData.tid;
-                Topics.reply({ uid: posterUid, content: 'test post', tid: anonTid }, (err) => {
-                    done(err);
-                });
+                Topics.reply({ uid: posterUid, content: 'test post', tid: anonTid }, done);
             });
         });
 
