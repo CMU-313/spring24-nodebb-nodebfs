@@ -943,8 +943,8 @@ describe('Categories', () => {
 
         it('should add a post and find anonymous upon retrieval', (done) => {
             Categories.getCategoryById({
-                cid: anonCid,
-                set: `cid:${anonCid}:tids`,
+                cid: categoryObj.cid,
+                set: `cid:${categoryObj.cid}:tids`,
                 reverse: true,
                 start: 0,
                 stop: -1,
