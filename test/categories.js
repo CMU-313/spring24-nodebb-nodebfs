@@ -160,8 +160,10 @@ describe('Categories', () => {
                 assert.ifError(err);
                 Categories.getRecentTopicReplies(categoryData, 0, {}, (err) => {
                     assert.ifError(err);
-                    assert.ok(Array.isArray(categoryData.topics), 'categoryData.topics should be an array');
-                    assert.ok('anonymous' in categoryData.topics.teaser, "categoryData.topics.teaser should have an 'anonymous' field.");
+                    assert.ok(categoryData.topics && categoryData.topics.length > 0, 'There should be at least one topic.');
+                    const isFirstTopicTeaserAnonymous = categoryData.topics[0].teaser.anonymous;
+                    assert.strictEqual(isFirstTopicTeaserAnonymous, false, 'The anonymous field in the first topic teaser should be boolean false.');
+                    });
                     done();
                 });
             });
