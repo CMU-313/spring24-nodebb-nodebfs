@@ -111,6 +111,55 @@ describe('Categories', () => {
                 assert.ifError(err);
                 Categories.getRecentTopicReplies(categoryData, 0, {}, (err) => {
                     assert.ifError(err);
+                    done();
+                });
+            });
+        });
+    });
+
+    describe('anonymous Categories.getRecentTopicReplies', () => {
+        let anonCid;
+        let anonTid;
+        before((done) => {
+            async.parallel({
+                category: function (next) {
+                    Categories.create({
+                        name: 'Test Category 1.5',
+                        description: 'Test category created by testing script for anonymous',
+                    }, next);
+                },
+                topic: function (next) {
+                    Topics.post({
+                        uid: posterUid,
+                        cid: categoryObj.cid,
+                        title: 'Test Topic Title',
+                        content: 'The content of anonymous test topic',
+                    }, next);
+                },
+            }, (err, results) => {
+                if (err) {
+                    return done(err);
+                }
+                anonCid = results.category.cid;
+                anonTid = results.topic.topicData.tid;
+                Topics.reply({ uid: posterUid, content: 'test post', tid: anonTid }, (err) => {
+                    done(err);
+                });
+            });
+        });
+
+        it('should add a post and find anonymous upon retrieval', (done) => {
+            Categories.getCategoryById({
+                cid: categoryObj.cid,
+                set: `cid:${categoryObj.cid}:tids`,
+                reverse: true,
+                start: 0,
+                stop: -1,
+                uid: 0,
+            }, (err, categoryData) => {
+                assert.ifError(err);
+                Categories.getRecentTopicReplies(categoryData, 0, {}, (err) => {
+                    assert.ifError(err);
                     assert.fail(JSON.stringify(categoryData));
                     assert.ok(Array.isArray(categoryData), 'categoryData should be an array');
                     categoryData.forEach((category) => {
