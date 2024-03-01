@@ -163,9 +163,8 @@ describe('Categories', () => {
                     assert.ok(categoryData.topics && categoryData.topics.length > 0, 'There should be at least one topic.');
                     const isFirstTopicTeaserAnonymous = categoryData.topics[0].teaser.anonymous;
                     assert.strictEqual(isFirstTopicTeaserAnonymous, false, 'The anonymous field in the first topic teaser should be boolean false.');
-                    });
-                    done();
                 });
+                done();
             });
         });
     });
