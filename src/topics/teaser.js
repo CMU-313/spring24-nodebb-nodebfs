@@ -15,7 +15,7 @@ module.exports = function (Topics) {
     // async function Topics.getTeasers(topics: object, options: number)
     Topics.getTeasers = async function (topics, options) {
         assert(typeof topics === 'object');
-        assert(typeof options === 'number');
+        assert(typeof options === 'number' || typeof options === 'object');
         if (!Array.isArray(topics) || !topics.length) {
             return [];
         }
