@@ -1,27 +1,26 @@
+"use strict";
 
-'use strict';
+const _ = require("lodash");
 
-const _ = require('lodash');
-
-const assert = require('assert');
-const db = require('../database');
-const utils = require('../utils');
-const slugify = require('../slugify');
-const plugins = require('../plugins');
-const analytics = require('../analytics');
-const user = require('../user');
-const meta = require('../meta');
-const posts = require('../posts');
-const privileges = require('../privileges');
-const categories = require('../categories');
-const translator = require('../translator');
+const assert = require("assert");
+const db = require("../database");
+const utils = require("../utils");
+const slugify = require("../slugify");
+const plugins = require("../plugins");
+const analytics = require("../analytics");
+const user = require("../user");
+const meta = require("../meta");
+const posts = require("../posts");
+const privileges = require("../privileges");
+const categories = require("../categories");
+const translator = require("../translator");
 
 module.exports = function (Topics) {
     Topics.create = async function (data) {
         // This is an internal method, consider using Topics.post instead
         const timestamp = data.timestamp || Date.now();
 
-        const tid = await db.incrObjectField('global', 'nextTid');
+        const tid = await db.incrObjectField("global", "nextTid");
 
         let topicData = {
             tid: tid,
@@ -29,7 +28,7 @@ module.exports = function (Topics) {
             cid: data.cid,
             mainPid: 0,
             title: data.title,
-            slug: `${tid}/${slugify(data.title) || 'topic'}`,
+            slug: `${tid}/${slugify(data.title) || "topic"}`,
             timestamp: timestamp,
             lastposttime: 0,
             postcount: 0,
@@ -37,50 +36,68 @@ module.exports = function (Topics) {
         };
 
         if (Array.isArray(data.tags) && data.tags.length) {
-            topicData.tags = data.tags.join(',');
+            topicData.tags = data.tags.join(",");
         }
 
-        const result = await plugins.hooks.fire('filter:topic.create', { topic: topicData, data: data });
+        const result = await plugins.hooks.fire("filter:topic.create", {
+            topic: topicData,
+            data: data,
+        });
         topicData = result.topic;
         await db.setObject(`topic:${topicData.tid}`, topicData);
 
         const timestampedSortedSetKeys = [
-            'topics:tid',
+            "topics:tid",
             `cid:${topicData.cid}:tids`,
             `cid:${topicData.cid}:uid:${topicData.uid}:tids`,
         ];
 
         const scheduled = timestamp > Date.now();
         if (scheduled) {
-            timestampedSortedSetKeys.push('topics:scheduled');
+            timestampedSortedSetKeys.push("topics:scheduled");
         }
 
         await Promise.all([
-            db.sortedSetsAdd(timestampedSortedSetKeys, timestamp, topicData.tid),
-            db.sortedSetsAdd([
-                'topics:views', 'topics:posts', 'topics:votes',
-                `cid:${topicData.cid}:tids:votes`,
-                `cid:${topicData.cid}:tids:posts`,
-                `cid:${topicData.cid}:tids:views`,
-            ], 0, topicData.tid),
+            db.sortedSetsAdd(
+                timestampedSortedSetKeys,
+                timestamp,
+                topicData.tid,
+            ),
+            db.sortedSetsAdd(
+                [
+                    "topics:views",
+                    "topics:posts",
+                    "topics:votes",
+                    `cid:${topicData.cid}:tids:votes`,
+                    `cid:${topicData.cid}:tids:posts`,
+                    `cid:${topicData.cid}:tids:views`,
+                ],
+                0,
+                topicData.tid,
+            ),
             user.addTopicIdToUser(topicData.uid, topicData.tid, timestamp),
-            db.incrObjectField(`category:${topicData.cid}`, 'topic_count'),
-            db.incrObjectField('global', 'topicCount'),
+            db.incrObjectField(`category:${topicData.cid}`, "topic_count"),
+            db.incrObjectField("global", "topicCount"),
             Topics.createTags(data.tags, topicData.tid, timestamp),
-            scheduled ? Promise.resolve() : categories.updateRecentTid(topicData.cid, topicData.tid),
+            scheduled
+                ? Promise.resolve()
+                : categories.updateRecentTid(topicData.cid, topicData.tid),
         ]);
         if (scheduled) {
             await Topics.scheduled.pin(tid, topicData);
         }
 
-        plugins.hooks.fire('action:topic.save', { topic: _.clone(topicData), data: data });
+        plugins.hooks.fire("action:topic.save", {
+            topic: _.clone(topicData),
+            data: data,
+        });
         return topicData.tid;
     };
 
     // type: async function post(data: 'object') => object
     Topics.post = async function (data) {
-        assert.equal(typeof (data), 'object');
-        data = await plugins.hooks.fire('filter:topic.post', data);
+        assert.equal(typeof data, "object");
+        data = await plugins.hooks.fire("filter:topic.post", data);
         const { uid } = data;
 
         data.title = String(data.title).trim();
@@ -88,8 +105,8 @@ module.exports = function (Topics) {
         if (data.content) {
             data.content = utils.rtrim(data.content);
         }
-        const u1 = await user.getUsersFields([uid], ['accounttype']);
-        if (u1[0].accounttype === 'student') {
+        const u1 = await user.getUsersFields([uid], ["accounttype"]);
+        if (u1[0].accounttype === "student") {
             Topics.checkTitle(data.title);
         } else {
             Topics.checkTitle2(data.title);
@@ -98,8 +115,8 @@ module.exports = function (Topics) {
         await Topics.validateTags(data.tags, data.cid, uid);
         data.tags = await Topics.filterTags(data.tags, data.cid);
         if (!data.fromQueue) {
-            const u0 = await user.getUsersFields([uid], ['accounttype']);
-            if (u0[0].accounttype === 'student') {
+            const u0 = await user.getUsersFields([uid], ["accounttype"]);
+            if (u0[0].accounttype === "student") {
                 Topics.checkContent(data.content);
             } else {
                 Topics.checkContent2(data.content);
@@ -108,16 +125,16 @@ module.exports = function (Topics) {
 
         const [categoryExists, canCreate, canTag] = await Promise.all([
             categories.exists(data.cid),
-            privileges.categories.can('topics:create', data.cid, uid),
-            privileges.categories.can('topics:tag', data.cid, uid),
+            privileges.categories.can("topics:create", data.cid, uid),
+            privileges.categories.can("topics:tag", data.cid, uid),
         ]);
 
         if (!categoryExists) {
-            throw new Error('[[error:no-category]]');
+            throw new Error("[[error:no-category]]");
         }
 
         if (!canCreate || (!canTag && data.tags.length)) {
-            throw new Error('[[error:no-privileges]]');
+            throw new Error("[[error:no-privileges]]");
         }
 
         await guestHandleValid(data);
@@ -140,7 +157,7 @@ module.exports = function (Topics) {
         ]);
 
         if (!Array.isArray(topics) || !topics.length) {
-            throw new Error('[[error:no-topic]]');
+            throw new Error("[[error:no-topic]]");
         }
 
         if (uid > 0 && settings.followTopicsOnCreate) {
@@ -156,25 +173,33 @@ module.exports = function (Topics) {
             await Topics.delete(tid);
         }
 
-        analytics.increment(['topics', `topics:byCid:${topicData.cid}`]);
-        plugins.hooks.fire('action:topic.post', { topic: topicData, post: postData, data: data });
+        analytics.increment(["topics", `topics:byCid:${topicData.cid}`]);
+        plugins.hooks.fire("action:topic.post", {
+            topic: topicData,
+            post: postData,
+            data: data,
+        });
 
         if (parseInt(uid, 10) && !topicData.scheduled) {
-            user.notifications.sendTopicNotificationToFollowers(uid, topicData, postData);
+            user.notifications.sendTopicNotificationToFollowers(
+                uid,
+                topicData,
+                postData,
+            );
         }
 
         const ret = {
             topicData: topicData,
             postData: postData,
         };
-        assert.equal(typeof (ret), 'object');
+        assert.equal(typeof ret, "object");
         return ret;
     };
 
     // type: async function post(data: 'object') => object
     Topics.reply = async function (data) {
-        assert.equal(typeof (data), 'object');
-        data = await plugins.hooks.fire('filter:topic.reply', data);
+        assert.equal(typeof data, "object");
+        data = await plugins.hooks.fire("filter:topic.reply", data);
         const { tid } = data;
         const { uid } = data;
 
@@ -190,8 +215,8 @@ module.exports = function (Topics) {
         }
         if (!data.fromQueue) {
             await user.isReadyToPost(uid, data.cid);
-            const u0 = await user.getUsersFields([uid], ['accounttype']);
-            if (u0[0].accounttype === 'student') {
+            const u0 = await user.getUsersFields([uid], ["accounttype"]);
+            if (u0[0].accounttype === "student") {
                 Topics.checkContent(data.content);
             } else {
                 Topics.checkContent2(data.content);
@@ -213,24 +238,31 @@ module.exports = function (Topics) {
         }
 
         if (parseInt(uid, 10)) {
-            user.setUserField(uid, 'lastonline', Date.now());
+            user.setUserField(uid, "lastonline", Date.now());
         }
 
         if (parseInt(uid, 10) || meta.config.allowGuestReplyNotifications) {
             const { displayname } = postData.user;
 
             Topics.notifyFollowers(postData, uid, {
-                type: 'new-reply',
-                bodyShort: translator.compile('notifications:user_posted_to', displayname, postData.topic.title),
+                type: "new-reply",
+                bodyShort: translator.compile(
+                    "notifications:user_posted_to",
+                    displayname,
+                    postData.topic.title,
+                ),
                 nid: `new_post:tid:${postData.topic.tid}:pid:${postData.pid}:uid:${uid}`,
                 mergeId: `notifications:user_posted_to|${postData.topic.tid}`,
             });
         }
 
-        analytics.increment(['posts', `posts:byCid:${data.cid}`]);
-        plugins.hooks.fire('action:topic.reply', { post: _.clone(postData), data: data });
+        analytics.increment(["posts", `posts:byCid:${data.cid}`]);
+        plugins.hooks.fire("action:topic.reply", {
+            post: _.clone(postData),
+            data: data,
+        });
 
-        assert.equal(typeof (postData), 'object');
+        assert.equal(typeof postData, "object");
         return postData;
     };
 
@@ -239,12 +271,18 @@ module.exports = function (Topics) {
         const { uid } = postData;
         await Topics.markAsUnreadForAll(tid);
         await Topics.markAsRead([tid], uid);
-        const [
-            userInfo,
-            topicInfo,
-        ] = await Promise.all([
+        const [userInfo, topicInfo] = await Promise.all([
             posts.getUserInfoForPosts([postData.uid], uid),
-            Topics.getTopicFields(tid, ['tid', 'uid', 'title', 'slug', 'cid', 'postcount', 'mainPid', 'scheduled']),
+            Topics.getTopicFields(tid, [
+                "tid",
+                "uid",
+                "title",
+                "slug",
+                "cid",
+                "postcount",
+                "mainPid",
+                "scheduled",
+            ]),
             Topics.addParentPosts([postData]),
             Topics.syncBacklinks(postData),
             posts.parsePost(postData),
@@ -272,37 +310,65 @@ module.exports = function (Topics) {
     // type: function checkTitle(content: 'string') => object
     // returns null, which is of type object
     Topics.checkTitle = function (title) {
-        assert.equal(typeof (title), 'string');
-        check(title, meta.config.minimumTitleLengthStudents, meta.config.maximumTitleLengthStudents, 'title-too-short', 'title-too-long');
+        assert.equal(typeof title, "string");
+        check(
+            title,
+            meta.config.minimumTitleLengthStudents,
+            meta.config.maximumTitleLengthStudents,
+            "title-too-short",
+            "title-too-long",
+        );
     };
 
     // type: function checkTitle2(content: 'string') => object
     // returns null, which is of type object
     Topics.checkTitle2 = function (title) {
-        assert.equal(typeof (title), 'string');
-        check(title, meta.config.minimumTitleLengthInstructors, meta.config.maximumTitleLengthInstructors, 'title-too-short', 'title-too-long');
+        assert.equal(typeof title, "string");
+        check(
+            title,
+            meta.config.minimumTitleLengthInstructors,
+            meta.config.maximumTitleLengthInstructors,
+            "title-too-short",
+            "title-too-long",
+        );
     };
 
     // type: function checkContent(content: 'string') => object
     // returns null, which is of type object
     Topics.checkContent = function (content) {
-        assert.equal(typeof (content), 'string');
-        check(content, meta.config.minimumPostLengthStudents, meta.config.maximumPostLengthStudents, 'content-too-short', 'content-too-long');
+        assert.equal(typeof content, "string");
+        check(
+            content,
+            meta.config.minimumPostLengthStudents,
+            meta.config.maximumPostLengthStudents,
+            "content-too-short",
+            "content-too-long",
+        );
     };
     // type: function checkContent2(content: 'string') => object
     // returns null, which is of type object
     Topics.checkContent2 = function (content) {
-        assert.equal(typeof (content), 'string');
-        check(content, meta.config.minimumPostLengthInstructors, meta.config.maximumPostLengthInstructors, 'content-too-short', 'content-too-long');
+        assert.equal(typeof content, "string");
+        check(
+            content,
+            meta.config.minimumPostLengthInstructors,
+            meta.config.maximumPostLengthInstructors,
+            "content-too-short",
+            "content-too-long",
+        );
     };
 
     function check(item, min, max, minError, maxError) {
         // Trim and remove HTML (latter for composers that send in HTML, like redactor)
-        if (typeof item === 'string') {
+        if (typeof item === "string") {
             item = utils.stripHTMLTags(item).trim();
         }
 
-        if (item === null || item === undefined || item.length < parseInt(min, 10)) {
+        if (
+            item === null ||
+            item === undefined ||
+            item.length < parseInt(min, 10)
+        ) {
             throw new Error(`[[error:${minError}, ${min}]]`);
         } else if (item.length > parseInt(max, 10)) {
             throw new Error(`[[error:${maxError}, ${max}]]`);
@@ -310,44 +376,48 @@ module.exports = function (Topics) {
     }
 
     async function guestHandleValid(data) {
-        if (meta.config.allowGuestHandles && parseInt(data.uid, 10) === 0 && data.handle) {
+        if (
+            meta.config.allowGuestHandles &&
+            parseInt(data.uid, 10) === 0 &&
+            data.handle
+        ) {
             if (data.handle.length > meta.config.maximumUsernameLength) {
-                throw new Error('[[error:guest-handle-invalid]]');
+                throw new Error("[[error:guest-handle-invalid]]");
             }
             const exists = await user.existsBySlug(slugify(data.handle));
             if (exists) {
-                throw new Error('[[error:username-taken]]');
+                throw new Error("[[error:username-taken]]");
             }
         }
     }
 
     async function canReply(data, topicData) {
         if (!topicData) {
-            throw new Error('[[error:no-topic]]');
+            throw new Error("[[error:no-topic]]");
         }
         const { tid, uid } = data;
         const { cid, deleted, locked, scheduled } = topicData;
 
         const [canReply, canSchedule, isAdminOrMod] = await Promise.all([
-            privileges.topics.can('topics:reply', tid, uid),
-            privileges.topics.can('topics:schedule', tid, uid),
+            privileges.topics.can("topics:reply", tid, uid),
+            privileges.topics.can("topics:schedule", tid, uid),
             privileges.categories.isAdminOrMod(cid, uid),
         ]);
 
         if (locked && !isAdminOrMod) {
-            throw new Error('[[error:topic-locked]]');
+            throw new Error("[[error:topic-locked]]");
         }
 
         if (!scheduled && deleted && !isAdminOrMod) {
-            throw new Error('[[error:topic-deleted]]');
+            throw new Error("[[error:topic-deleted]]");
         }
 
         if (scheduled && !canSchedule) {
-            throw new Error('[[error:no-privileges]]');
+            throw new Error("[[error:no-privileges]]");
         }
 
         if (!canReply) {
-            throw new Error('[[error:no-privileges]]');
+            throw new Error("[[error:no-privileges]]");
         }
     }
 };

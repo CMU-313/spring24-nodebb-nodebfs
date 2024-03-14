@@ -1,14 +1,14 @@
-'use strict';
+"use strict";
 
-const assert = require('assert');
-const fs = require('fs');
-const path = require('path');
+const assert = require("assert");
+const fs = require("fs");
+const path = require("path");
 // const sinon = require('sinon');
 // const chalk = require('chalk');
-const db = require('./mocks/databasemock');
-const upgrade = require('../src/upgrade');
+const db = require("./mocks/databasemock");
+const upgrade = require("../src/upgrade");
 
-describe('Upgrade', () => {
+describe("Upgrade", () => {
     // describe('duplicate files test', () => {
     //     const upgradesDir1 = path.join(__dirname, '../src/upgrades/1.19.3');
     //     const upgradesDir2 = path.join(__dirname, '../src/upgrades/1.19.2');
@@ -61,19 +61,19 @@ describe('Upgrade', () => {
     //     assert.equal(err.message, '[[error:duplicate-upgrade-scripts]]');
     // });
 
-    it('should get all upgrade scripts', async () => {
+    it("should get all upgrade scripts", async () => {
         const files = await upgrade.getAll();
         assert(Array.isArray(files) && files.length > 0);
     });
 
-    it('should throw error', async () => {
+    it("should throw error", async () => {
         let err;
         try {
             await upgrade.check();
         } catch (_err) {
             err = _err;
         }
-        assert.equal(err.message, 'schema-out-of-date');
+        assert.equal(err.message, "schema-out-of-date");
     });
 
     // describe('Upgrade process test', function() {
@@ -129,15 +129,15 @@ describe('Upgrade', () => {
     //     });
     // });
 
-    it('should run all upgrades', async () => {
+    it("should run all upgrades", async () => {
         // for upgrade scripts to run
-        await db.set('schemaDate', 1);
+        await db.set("schemaDate", 1);
         await upgrade.run();
     });
 
-    it('should run particular upgrades', async () => {
+    it("should run particular upgrades", async () => {
         const files = await upgrade.getAll();
-        await db.set('schemaDate', 1);
+        await db.set("schemaDate", 1);
         await upgrade.runParticular(files.slice(0, 2));
     });
 });

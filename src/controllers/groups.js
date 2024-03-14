@@ -1,51 +1,52 @@
-'use strict';
+"use strict";
 
-const validator = require('validator');
-const nconf = require('nconf');
+const validator = require("validator");
+const nconf = require("nconf");
 
-const assert = require('assert');
-const meta = require('../meta');
-const groups = require('../groups');
-const user = require('../user');
-const helpers = require('./helpers');
-const pagination = require('../pagination');
-const privileges = require('../privileges');
+const assert = require("assert");
+const meta = require("../meta");
+const groups = require("../groups");
+const user = require("../user");
+const helpers = require("./helpers");
+const pagination = require("../pagination");
+const privileges = require("../privileges");
 
 const groupsController = module.exports;
 
 groupsController.list = async function (req, res) {
-    const sort = req.query.sort || 'alpha';
+    const sort = req.query.sort || "alpha";
 
     const [groupData, allowGroupCreation] = await Promise.all([
         groups.getGroupsBySort(sort, 0, 14),
-        privileges.global.can('group:create', req.uid),
+        privileges.global.can("group:create", req.uid),
     ]);
 
-    res.render('groups/list', {
+    res.render("groups/list", {
         groups: groupData,
         allowGroupCreation: allowGroupCreation,
         nextStart: 15,
-        title: '[[pages:groups]]',
-        breadcrumbs: helpers.buildBreadcrumbs([{ text: '[[pages:groups]]' }]),
+        title: "[[pages:groups]]",
+        breadcrumbs: helpers.buildBreadcrumbs([{ text: "[[pages:groups]]" }]),
     });
 };
-
 
 // groupsController.details
 // req - request object
 // res - response object
 // next - pass control to middleware
 groupsController.details = async function (req, res, next) {
-    assert(typeof req === 'object');
-    assert(typeof res === 'object');
-    assert(typeof next === 'function');
+    assert(typeof req === "object");
+    assert(typeof res === "object");
+    assert(typeof next === "function");
 
     const lowercaseSlug = req.params.slug.toLowerCase();
     if (req.params.slug !== lowercaseSlug) {
         if (res.locals.isAPI) {
             req.params.slug = lowercaseSlug;
         } else {
-            return res.redirect(`${nconf.get('relative_path')}/groups/${lowercaseSlug}`);
+            return res.redirect(
+                `${nconf.get("relative_path")}/groups/${lowercaseSlug}`,
+            );
         }
     }
     const groupName = await groups.getGroupNameByGroupSlug(req.params.slug);
@@ -81,31 +82,36 @@ groupsController.details = async function (req, res, next) {
     if (!groupData) {
         return next();
     }
-    groupData.isOwner = groupData.isOwner || isAdmin || (isGlobalMod && !groupData.system);
+    groupData.isOwner =
+        groupData.isOwner || isAdmin || (isGlobalMod && !groupData.system);
 
-    const postsAnonymous = posts.map(post => ({
+    const postsAnonymous = posts.map((post) => ({
         ...post,
-        user: post.anonymous ?
-            {
-                uid: 0,
-                username: 'anonymous',
-                userslug: 'anonymous',
-                picture: null,
-                status: 'online',
-                displayname: 'Anonymous User',
-                'icon:text': 'A',
-                'icon:bgColor': '#3f51b5',
-            } : post.user,
+        user: post.anonymous
+            ? {
+                  uid: 0,
+                  username: "anonymous",
+                  userslug: "anonymous",
+                  picture: null,
+                  status: "online",
+                  displayname: "Anonymous User",
+                  "icon:text": "A",
+                  "icon:bgColor": "#3f51b5",
+              }
+            : post.user,
     }));
 
-    res.render('groups/details', {
+    res.render("groups/details", {
         title: `[[pages:group, ${groupData.displayName}]]`,
         group: groupData,
         posts: postsAnonymous,
         isAdmin: isAdmin,
         isGlobalMod: isGlobalMod,
         allowPrivateGroups: meta.config.allowPrivateGroups,
-        breadcrumbs: helpers.buildBreadcrumbs([{ text: '[[pages:groups]]', url: '/groups' }, { text: groupData.displayName }]),
+        breadcrumbs: helpers.buildBreadcrumbs([
+            { text: "[[pages:groups]]", url: "/groups" },
+            { text: groupData.displayName },
+        ]),
     });
 };
 
@@ -118,26 +124,38 @@ groupsController.members = async function (req, res, next) {
     if (!groupName) {
         return next();
     }
-    const [groupData, isAdminOrGlobalMod, isMember, isHidden] = await Promise.all([
-        groups.getGroupData(groupName),
-        user.isAdminOrGlobalMod(req.uid),
-        groups.isMember(req.uid, groupName),
-        groups.isHidden(groupName),
-    ]);
+    const [groupData, isAdminOrGlobalMod, isMember, isHidden] =
+        await Promise.all([
+            groups.getGroupData(groupName),
+            user.isAdminOrGlobalMod(req.uid),
+            groups.isMember(req.uid, groupName),
+            groups.isHidden(groupName),
+        ]);
 
     if (isHidden && !isMember && !isAdminOrGlobalMod) {
         return next();
     }
-    const users = await user.getUsersFromSet(`group:${groupName}:members`, req.uid, start, stop);
+    const users = await user.getUsersFromSet(
+        `group:${groupName}:members`,
+        req.uid,
+        start,
+        stop,
+    );
 
     const breadcrumbs = helpers.buildBreadcrumbs([
-        { text: '[[pages:groups]]', url: '/groups' },
-        { text: validator.escape(String(groupName)), url: `/groups/${req.params.slug}` },
-        { text: '[[groups:details.members]]' },
+        { text: "[[pages:groups]]", url: "/groups" },
+        {
+            text: validator.escape(String(groupName)),
+            url: `/groups/${req.params.slug}`,
+        },
+        { text: "[[groups:details.members]]" },
     ]);
 
-    const pageCount = Math.max(1, Math.ceil(groupData.memberCount / usersPerPage));
-    res.render('groups/members', {
+    const pageCount = Math.max(
+        1,
+        Math.ceil(groupData.memberCount / usersPerPage),
+    );
+    res.render("groups/members", {
         users: users,
         pagination: pagination.create(page, pageCount, req.query),
         breadcrumbs: breadcrumbs,
