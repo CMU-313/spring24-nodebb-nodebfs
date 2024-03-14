@@ -3,7 +3,6 @@
 
 const _ = require('lodash');
 
-const assert = require('assert');
 const db = require('../database');
 const meta = require('../meta');
 const user = require('../user');
@@ -12,10 +11,7 @@ const plugins = require('../plugins');
 const utils = require('../utils');
 
 module.exports = function (Topics) {
-    // async function Topics.getTeasers(topics: object, options: number)
     Topics.getTeasers = async function (topics, options) {
-        assert(typeof topics === 'object');
-        assert(typeof options === 'number');
         if (!Array.isArray(topics) || !topics.length) {
             return [];
         }
@@ -47,7 +43,7 @@ module.exports = function (Topics) {
         });
 
         const [allPostData, callerSettings] = await Promise.all([
-            posts.getPostsFields(teaserPids, ['pid', 'uid', 'timestamp', 'tid', 'content', 'anonymous']),
+            posts.getPostsFields(teaserPids, ['pid', 'uid', 'timestamp', 'tid', 'content']),
             user.getSettings(uid),
         ]);
         let postData = allPostData.filter(post => post && post.pid);
@@ -71,7 +67,6 @@ module.exports = function (Topics) {
             post.user = users[post.uid];
             post.timestampISO = utils.toISOString(post.timestamp);
             tidToPost[post.tid] = post;
-            post.anonymous = post.anonymous === 'true';
         });
         await Promise.all(postData.map(p => posts.parsePost(p)));
 
