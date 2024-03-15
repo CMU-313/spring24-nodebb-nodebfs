@@ -29,7 +29,7 @@ categoriesController.list = async function (req, res) {
     let stage = new Iroh.Stage(code);
     let listener = stage.addListener(Iroh.VAR);
     listener.on("after", (e) => {
-    console.log(e.name, "=>", e.value);
+        console.log(e.name, "=>", e.value);
     });
     eval(stage.script);
     // iroh change end, above pageCount not in scope below, so create actual pageCount below
