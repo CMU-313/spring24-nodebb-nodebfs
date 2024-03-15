@@ -31,6 +31,8 @@ categoriesController.list = async function (req, res) {
     listener.on('after', (e) => {
         console.log(e.name, '=>', e.value);
     });
+    // eslint-disable-next-line no-eval
+    eval(stage.script);
     // iroh change end, above pageCount not in scope below, so create actual pageCount below
     const pageCount = Math.max(1, Math.ceil(rootCids.length / meta.config.categoriesPerPage));
     const page = Math.min(parseInt(req.query.page, 10) || 1, pageCount);
@@ -67,6 +69,5 @@ categoriesController.list = async function (req, res) {
         });
     }
 
-    eval(stage.script); // for iroh
     res.render('categories', data);
 };
