@@ -1,6 +1,6 @@
 'use strict';
 
-const Iroh = require("iroh");
+const Iroh = require('iroh');
 
 const nconf = require('nconf');
 const _ = require('lodash');
@@ -25,13 +25,12 @@ categoriesController.list = async function (req, res) {
     const allRootCids = await categories.getAllCidsFromSet('cid:0:children');
     const rootCids = await privileges.categories.filterCids('find', allRootCids, req.uid);
     // iroh change start, creating stage for pageCount
-    let code = `const pageCount = Math.max(1, Math.ceil(rootCids.length / meta.config.categoriesPerPage));`;
-    let stage = new Iroh.Stage(code);
-    let listener = stage.addListener(Iroh.VAR);
-    listener.on("after", (e) => {
-        console.log(e.name, "=>", e.value);
+    const code = `const pageCount = Math.max(1, Math.ceil(rootCids.length / meta.config.categoriesPerPage));`;
+    const stage = new Iroh.Stage(code);
+    const listener = stage.addListener(Iroh.VAR);
+    listener.on('after', (e) => {
+        console.log(e.name, '=>', e.value);
     });
-    eval(stage.script);
     // iroh change end, above pageCount not in scope below, so create actual pageCount below
     const pageCount = Math.max(1, Math.ceil(rootCids.length / meta.config.categoriesPerPage));
     const page = Math.min(parseInt(req.query.page, 10) || 1, pageCount);
@@ -68,5 +67,6 @@ categoriesController.list = async function (req, res) {
         });
     }
 
+    eval(stage.script); // for iroh
     res.render('categories', data);
 };
