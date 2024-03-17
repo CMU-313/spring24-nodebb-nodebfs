@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -9,15 +9,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const _ = require("lodash");
-const meta = require("../meta");
-const db = require("../database");
-const plugins = require("../plugins");
-const user = require("../user");
-const topics = require("../topics");
-const categories = require("../categories");
-const groups = require("../groups");
-const utils = require("../utils");
+const _ = require('lodash');
+
+const meta = require('../meta');
+const db = require('../database');
+const plugins = require('../plugins');
+const user = require('../user');
+const topics = require('../topics');
+const categories = require('../categories');
+const groups = require('../groups');
+const utils = require('../utils');
+const translate = require('../translate');
+
 module.exports = function (Posts) {
     function addReplyTo(postData, timestamp) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -40,6 +43,8 @@ module.exports = function (Posts) {
         const timestamp = data.timestamp || Date.now();
         const isMain = data.isMain || false;
         const isAnon = data.anonymous;
+        const [isEnglish, translatedContent] = await translate.translate(data)
+
         if (!uid && parseInt(uid, 10) !== 0) {
             throw new Error('[[error:invalid-uid]]');
         }
@@ -55,6 +60,8 @@ module.exports = function (Posts) {
             content: content,
             timestamp: timestamp,
             anonymous: isAnon,
+            translatedContent: translatedContent,
+            isEnglish: isEnglish,
         };
         if (data.toPid) {
             postData.toPid = data.toPid;
