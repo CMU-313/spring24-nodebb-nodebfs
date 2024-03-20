@@ -126,7 +126,7 @@ describe('minifier', () => {
             assert.ifError(err);
             assert.strictEqual(
                 bundle.code,
-                '.help {\n margin: 10px; }\n .yellow {\n background: yellow;\n}\n\n.help {\n  display: block;\n}\n.help .blue {\n  background: blue;\n}\n',
+                '.help {\n  margin: 10px;\n}\n.yellow {\n background: yellow;\n}\n\n.help {\n  display: block;\n}\n.help .blue {\n  background: blue;\n}\n',
             );
             done();
         });
