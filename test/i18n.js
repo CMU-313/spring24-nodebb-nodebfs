@@ -18,14 +18,17 @@ describe('i18n', () => {
             this.skip();
         }
 
-        folders = await fs.promises.readdir(path.resolve(__dirname, '../public/language'));
+        folders = await fs.promises.readdir(
+            path.resolve(__dirname, '../public/language'),
+        );
         folders = folders.filter(f => f !== 'README.md');
     });
 
     it('should contain folders named after the language code', async () => {
-        const valid = /(?:README.md|^[a-z]{2}(?:-[A-Z]{2})?$|^[a-z]{2}(?:-x-[a-z]+)?$)/; // good luck
+        const valid =
+            /(?:README.md|^[a-z]{2}(?:-[A-Z]{2})?$|^[a-z]{2}(?:-x-[a-z]+)?$)/; // good luck
 
-        folders.forEach((folder) => {
+        folders.forEach(folder => {
             assert(valid.test(folder));
         });
     });
@@ -40,13 +43,16 @@ describe('i18n', () => {
         describe('source language file structure', () => {
             it('should only contain valid JSON files', async () => {
                 try {
-                    fullPaths.forEach((fullPath) => {
+                    fullPaths.forEach(fullPath => {
                         if (fullPath.endsWith('_DO_NOT_EDIT_FILES_HERE.md')) {
                             return;
                         }
 
                         const hash = require(fullPath);
-                        sourceStrings.set(fullPath.replace(sourcePath, ''), hash);
+                        sourceStrings.set(
+                            fullPath.replace(sourcePath, ''),
+                            hash,
+                        );
                     });
                 } catch (e) {
                     assert(!e, `Invalid JSON found: ${e.message}`);
@@ -54,31 +60,45 @@ describe('i18n', () => {
             });
         });
 
-        folders.forEach((language) => {
+        folders.forEach(language => {
             describe(`"${language}" file structure`, () => {
                 let files;
 
                 before(async () => {
-                    const translationPath = path.resolve(__dirname, `../public/language/${language}`);
-                    files = (await file.walk(translationPath)).map(path => path.replace(translationPath, ''));
+                    const translationPath = path.resolve(
+                        __dirname,
+                        `../public/language/${language}`,
+                    );
+                    files = (await file.walk(translationPath)).map(path =>
+                        path.replace(translationPath, ''),
+                    );
                 });
 
                 it('translations should contain every language file contained in the source language directory', () => {
-                    sourceFiles.forEach((relativePath) => {
-                        assert(files.includes(relativePath), `${relativePath.slice(1)} was found in source files but was not found in language "${language}" (likely not internationalized)`);
+                    sourceFiles.forEach(relativePath => {
+                        assert(
+                            files.includes(relativePath),
+                            `${relativePath.slice(1)} was found in source files but was not found in language "${language}" (likely not internationalized)`,
+                        );
                     });
                 });
 
                 it('should not contain any extraneous files not included in the source language directory', () => {
-                    files.forEach((relativePath) => {
-                        assert(sourceFiles.includes(relativePath), `${relativePath.slice(1)} was found in language "${language}" but there is no source file for it (likely removed from en-GB)`);
+                    files.forEach(relativePath => {
+                        assert(
+                            sourceFiles.includes(relativePath),
+                            `${relativePath.slice(1)} was found in language "${language}" but there is no source file for it (likely removed from en-GB)`,
+                        );
                     });
                 });
             });
 
             describe(`"${language}" file contents`, () => {
                 let fullPaths;
-                const translationPath = path.resolve(__dirname, `../public/language/${language}`);
+                const translationPath = path.resolve(
+                    __dirname,
+                    `../public/language/${language}`,
+                );
                 const strings = new Map();
 
                 before(async () => {
@@ -87,13 +107,18 @@ describe('i18n', () => {
 
                 it('should contain only valid JSON files', () => {
                     try {
-                        fullPaths.forEach((fullPath) => {
-                            if (fullPath.endsWith('_DO_NOT_EDIT_FILES_HERE.md')) {
+                        fullPaths.forEach(fullPath => {
+                            if (
+                                fullPath.endsWith('_DO_NOT_EDIT_FILES_HERE.md')
+                            ) {
                                 return;
                             }
 
                             const hash = require(fullPath);
-                            strings.set(fullPath.replace(translationPath, ''), hash);
+                            strings.set(
+                                fullPath.replace(translationPath, ''),
+                                hash,
+                            );
                         });
                     } catch (e) {
                         assert(!e, `Invalid JSON found: ${e.message}`);

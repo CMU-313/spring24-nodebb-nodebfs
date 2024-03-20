@@ -22,7 +22,10 @@ categoriesAPI.get = async function (caller, data) {
 
 categoriesAPI.create = async function (caller, data) {
     const response = await categories.create(data);
-    const categoryObjs = await categories.getCategories([response.cid], caller.uid);
+    const categoryObjs = await categories.getCategories(
+        [response.cid],
+        caller.uid,
+    );
     return categoryObjs[0];
 };
 
@@ -68,7 +71,9 @@ categoriesAPI.setPrivilege = async (caller, data) => {
     if (!userExists && !groupExists) {
         throw new Error('[[error:no-user-or-group]]');
     }
-    const privs = Array.isArray(data.privilege) ? data.privilege : [data.privilege];
+    const privs = Array.isArray(data.privilege)
+        ? data.privilege
+        : [data.privilege];
     const type = data.set ? 'give' : 'rescind';
     if (!privs.length) {
         throw new Error('[[error:invalid-data]]');
@@ -86,7 +91,9 @@ categoriesAPI.setPrivilege = async (caller, data) => {
         }
     } else {
         const categoryPrivList = await privileges.categories.getPrivilegeList();
-        const categoryPrivs = privs.filter(priv => categoryPrivList.includes(priv));
+        const categoryPrivs = privs.filter(priv =>
+            categoryPrivList.includes(priv),
+        );
         await privileges.categories[type](categoryPrivs, data.cid, data.member);
     }
 

@@ -19,11 +19,15 @@ const SocketHelpers = module.exports;
 SocketHelpers.notifyNew = async function (uid, type, result) {
     let uids = await user.getUidsFromSet('users:online', 0, -1);
     uids = uids.filter(toUid => parseInt(toUid, 10) !== uid);
-    await batch.processArray(uids, async (uids) => {
-        await notifyUids(uid, uids, type, result);
-    }, {
-        interval: 1000,
-    });
+    await batch.processArray(
+        uids,
+        async uids => {
+            await notifyUids(uid, uids, type, result);
+        },
+        {
+            interval: 1000,
+        },
+    );
 };
 
 async function notifyUids(uid, uids, type, result) {
@@ -35,8 +39,14 @@ async function notifyUids(uid, uids, type, result) {
 
     const watchStates = await getWatchStates(watchStateUids, tid, cid);
 
-    const categoryWatchStates = _.zipObject(watchStateUids, watchStates.categoryWatchStates);
-    const topicFollowState = _.zipObject(watchStateUids, watchStates.topicFollowed);
+    const categoryWatchStates = _.zipObject(
+        watchStateUids,
+        watchStates.categoryWatchStates,
+    );
+    const topicFollowState = _.zipObject(
+        watchStateUids,
+        watchStates.topicFollowed,
+    );
     uids = filterTidCidIgnorers(watchStateUids, watchStates);
     uids = await user.blocks.filterUids(uid, uids);
     uids = await user.blocks.filterUids(post.topic.uid, uids);
@@ -49,7 +59,7 @@ async function notifyUids(uid, uids, type, result) {
 
     post.ip = undefined;
 
-    data.uidsTo.forEach((toUid) => {
+    data.uidsTo.forEach(toUid => {
         post.categoryWatchState = categoryWatchStates[toUid];
         post.topic.isFollowing = topicFollowState[toUid];
         websockets.in(`uid_${toUid}`).emit('event:new_post', result);
@@ -68,12 +78,21 @@ async function getWatchStates(uids, tid, cid) {
 }
 
 function filterTidCidIgnorers(uids, watchStates) {
-    return uids.filter((uid, index) => watchStates.topicFollowed[index] ||
-        (!watchStates.topicIgnored[index] &&
-            watchStates.categoryWatchStates[index] !== categories.watchStates.ignoring));
+    return uids.filter(
+        (uid, index) =>
+            watchStates.topicFollowed[index] ||
+            (!watchStates.topicIgnored[index] &&
+                watchStates.categoryWatchStates[index] !==
+                    categories.watchStates.ignoring),
+    );
 }
 
-SocketHelpers.sendNotificationToPostOwner = async function (pid, fromuid, command, notification) {
+SocketHelpers.sendNotificationToPostOwner = async function (
+    pid,
+    fromuid,
+    command,
+    notification,
+) {
     if (!pid || !fromuid || !notification) {
         return;
     }
@@ -83,7 +102,12 @@ SocketHelpers.sendNotificationToPostOwner = async function (pid, fromuid, comman
         privileges.posts.can('topics:read', pid, postData.uid),
         topics.isIgnoring([postData.tid], postData.uid),
     ]);
-    if (!canRead || isIgnoring[0] || !postData.uid || fromuid === postData.uid) {
+    if (
+        !canRead ||
+        isIgnoring[0] ||
+        !postData.uid ||
+        fromuid === postData.uid
+    ) {
         return;
     }
     const [userData, topicTitle, postObj] = await Promise.all([
@@ -113,8 +137,12 @@ SocketHelpers.sendNotificationToPostOwner = async function (pid, fromuid, comman
     notifications.push(notifObj, [postData.uid]);
 };
 
-
-SocketHelpers.sendNotificationToTopicOwner = async function (tid, fromuid, command, notification) {
+SocketHelpers.sendNotificationToTopicOwner = async function (
+    tid,
+    fromuid,
+    command,
+    notification,
+) {
     if (!tid || !fromuid || !notification) {
         return;
     }
@@ -149,7 +177,14 @@ SocketHelpers.sendNotificationToTopicOwner = async function (tid, fromuid, comma
 };
 
 SocketHelpers.upvote = async function (data, notification) {
-    if (!data || !data.post || !data.post.uid || !data.post.votes || !data.post.pid || !data.fromuid) {
+    if (
+        !data ||
+        !data.post ||
+        !data.post.uid ||
+        !data.post.votes ||
+        !data.post.pid ||
+        !data.fromuid
+    ) {
         return;
     }
 
@@ -169,7 +204,10 @@ SocketHelpers.upvote = async function (data, notification) {
             return votes > 0 && votes % 10 === 0;
         },
         threshold: function () {
-            return [1, 5, 10, 25].includes(votes) || (votes >= 50 && votes % 50 === 0);
+            return (
+                [1, 5, 10, 25].includes(votes) ||
+                (votes >= 50 && votes % 50 === 0)
+            );
         },
         logarithmic: function () {
             return votes > 1 && Math.log10(votes) % 1 === 0;
@@ -182,7 +220,12 @@ SocketHelpers.upvote = async function (data, notification) {
     const should = shouldNotify[settings.upvoteNotifFreq] || shouldNotify.all;
 
     if (should()) {
-        SocketHelpers.sendNotificationToPostOwner(pid, fromuid, 'upvote', notification);
+        SocketHelpers.sendNotificationToPostOwner(
+            pid,
+            fromuid,
+            'upvote',
+            notification,
+        );
     }
 };
 

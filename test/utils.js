@@ -1,6 +1,5 @@
 'use strict';
 
-
 const assert = require('assert');
 const { JSDOM } = require('jsdom');
 const slugify = require('../src/slugify');
@@ -19,48 +18,64 @@ describe('Utility Methods', () => {
     const utils = require('../public/src/utils');
 
     // https://github.com/jprichardson/string.js/blob/master/test/string.test.js
-    it('should decode HTML entities', (done) => {
+    it('should decode HTML entities', done => {
         assert.strictEqual(
             utils.decodeHTMLEntities('Ken Thompson &amp; Dennis Ritchie'),
-            'Ken Thompson & Dennis Ritchie'
+            'Ken Thompson & Dennis Ritchie',
         );
-        assert.strictEqual(
-            utils.decodeHTMLEntities('3 &lt; 4'),
-            '3 < 4'
-        );
+        assert.strictEqual(utils.decodeHTMLEntities('3 &lt; 4'), '3 < 4');
         assert.strictEqual(
             utils.decodeHTMLEntities('http:&#47;&#47;'),
-            'http://'
+            'http://',
         );
         done();
     });
-    it('should strip HTML tags', (done) => {
-        assert.strictEqual(utils.stripHTMLTags('<p>just <b>some</b> text</p>'), 'just some text');
-        assert.strictEqual(utils.stripHTMLTags('<p>just <b>some</b> text</p>', ['p']), 'just <b>some</b> text');
-        assert.strictEqual(utils.stripHTMLTags('<i>just</i> some <image/> text', ['i']), 'just some <image/> text');
-        assert.strictEqual(utils.stripHTMLTags('<i>just</i> some <image/> <div>text</div>', ['i', 'div']), 'just some <image/> text');
+    it('should strip HTML tags', done => {
+        assert.strictEqual(
+            utils.stripHTMLTags('<p>just <b>some</b> text</p>'),
+            'just some text',
+        );
+        assert.strictEqual(
+            utils.stripHTMLTags('<p>just <b>some</b> text</p>', ['p']),
+            'just <b>some</b> text',
+        );
+        assert.strictEqual(
+            utils.stripHTMLTags('<i>just</i> some <image/> text', ['i']),
+            'just some <image/> text',
+        );
+        assert.strictEqual(
+            utils.stripHTMLTags('<i>just</i> some <image/> <div>text</div>', [
+                'i',
+                'div',
+            ]),
+            'just some <image/> text',
+        );
         done();
     });
 
-    it('should preserve case if requested', (done) => {
+    it('should preserve case if requested', done => {
         assert.strictEqual(slugify('UPPER CASE', true), 'UPPER-CASE');
         done();
     });
 
-    it('should work if a number is passed in', (done) => {
+    it('should work if a number is passed in', done => {
         assert.strictEqual(slugify(12345), '12345');
         done();
     });
 
     describe('username validation', () => {
         it('accepts latin-1 characters', () => {
-            const username = "John\"'-. Doeäâèéë1234";
+            const username = 'John"\'-. Doeäâèéë1234';
             assert(utils.isUserNameValid(username), 'invalid username');
         });
 
         it('rejects empty string', () => {
             const username = '';
-            assert.equal(utils.isUserNameValid(username), false, 'accepted as valid username');
+            assert.equal(
+                utils.isUserNameValid(username),
+                false,
+                'accepted as valid username',
+            );
         });
 
         it('should reject new lines', () => {
@@ -85,7 +100,10 @@ describe('Utility Methods', () => {
         });
 
         it('accepts quotes', () => {
-            assert(utils.isUserNameValid('baris "the best" usakli'), 'invalid username');
+            assert(
+                utils.isUserNameValid('baris "the best" usakli'),
+                'invalid username',
+            );
         });
     });
 
@@ -96,7 +114,11 @@ describe('Utility Methods', () => {
         });
         it('rejects empty address', () => {
             const email = '';
-            assert.equal(utils.isEmailValid(email), false, 'accepted as valid email');
+            assert.equal(
+                utils.isEmailValid(email),
+                false,
+                'accepted as valid email',
+            );
         });
     });
 
@@ -111,13 +133,13 @@ describe('Utility Methods', () => {
     });
 
     describe('cleanUpTag', () => {
-        it('should cleanUp a tag', (done) => {
+        it('should cleanUp a tag', done => {
             const cleanedTag = utils.cleanUpTag(',/#!$^*;TaG1:{}=_`<>\'"~()?|');
             assert.equal(cleanedTag, 'tag1');
             done();
         });
 
-        it('should return empty string for invalid tags', (done) => {
+        it('should return empty string for invalid tags', done => {
             assert.strictEqual(utils.cleanUpTag(undefined), '');
             assert.strictEqual(utils.cleanUpTag(null), '');
             assert.strictEqual(utils.cleanUpTag(false), '');
@@ -127,23 +149,33 @@ describe('Utility Methods', () => {
         });
     });
 
-    it('should remove punctuation', (done) => {
-        const removed = utils.removePunctuation('some text with , ! punctuation inside "');
+    it('should remove punctuation', done => {
+        const removed = utils.removePunctuation(
+            'some text with , ! punctuation inside "',
+        );
         assert.equal(removed, 'some text with   punctuation inside ');
         done();
     });
 
-    it('should return true if string has language key', (done) => {
-        assert.equal(utils.hasLanguageKey('some text [[topic:title]] and [[user:reputaiton]]'), true);
+    it('should return true if string has language key', done => {
+        assert.equal(
+            utils.hasLanguageKey(
+                'some text [[topic:title]] and [[user:reputaiton]]',
+            ),
+            true,
+        );
         done();
     });
 
-    it('should return false if string does not have language key', (done) => {
-        assert.equal(utils.hasLanguageKey('some text with no language keys'), false);
+    it('should return false if string does not have language key', done => {
+        assert.equal(
+            utils.hasLanguageKey('some text with no language keys'),
+            false,
+        );
         done();
     });
 
-    it('should shallow merge two objects', (done) => {
+    it('should shallow merge two objects', done => {
         const a = { foo: 1, cat1: 'ginger' };
         const b = { baz: 2, cat2: 'phoebe' };
         const obj = utils.merge(a, b);
@@ -154,76 +186,76 @@ describe('Utility Methods', () => {
         done();
     });
 
-    it('should return the file extesion', (done) => {
+    it('should return the file extesion', done => {
         assert.equal(utils.fileExtension('/path/to/some/file.png'), 'png');
         done();
     });
 
-    it('should return file mime type', (done) => {
+    it('should return file mime type', done => {
         assert.equal(utils.fileMimeType('/path/to/some/file.png'), 'image/png');
         done();
     });
 
-    it('should check if url is relative', (done) => {
+    it('should check if url is relative', done => {
         assert.equal(utils.isRelativeUrl('/topic/1/slug'), true);
         done();
     });
 
-    it('should check if url is relative', (done) => {
+    it('should check if url is relative', done => {
         assert.equal(utils.isRelativeUrl('https://nodebb.org'), false);
         done();
     });
 
-    it('should make number human readable', (done) => {
+    it('should make number human readable', done => {
         assert.equal(utils.makeNumberHumanReadable('1000'), '1.0k');
         done();
     });
 
-    it('should make number human readable', (done) => {
+    it('should make number human readable', done => {
         assert.equal(utils.makeNumberHumanReadable('1100000'), '1.1m');
         done();
     });
 
-    it('should make number human readable', (done) => {
+    it('should make number human readable', done => {
         assert.equal(utils.makeNumberHumanReadable('100'), '100');
         done();
     });
 
-    it('should make number human readable', (done) => {
+    it('should make number human readable', done => {
         assert.equal(utils.makeNumberHumanReadable(null), null);
         done();
     });
 
-    it('should make numbers human readable on elements', (done) => {
+    it('should make numbers human readable on elements', done => {
         const el = $('<div title="100000"></div>');
         utils.makeNumbersHumanReadable(el);
         assert.equal(el.html(), '100.0k');
         done();
     });
 
-    it('should add commas to numbers', (done) => {
+    it('should add commas to numbers', done => {
         assert.equal(utils.addCommas('100'), '100');
         done();
     });
 
-    it('should add commas to numbers', (done) => {
+    it('should add commas to numbers', done => {
         assert.equal(utils.addCommas('1000'), '1,000');
         done();
     });
 
-    it('should add commas to numbers', (done) => {
+    it('should add commas to numbers', done => {
         assert.equal(utils.addCommas('1000000'), '1,000,000');
         done();
     });
 
-    it('should add commas to elements', (done) => {
+    it('should add commas to elements', done => {
         const el = $('<div>1000000</div>');
         utils.addCommasToNumbers(el);
         assert.equal(el.html(), '1,000,000');
         done();
     });
 
-    it('should return passed in value if invalid', (done) => {
+    it('should return passed in value if invalid', done => {
         // eslint-disable-next-line no-loss-of-precision
         const bigInt = -111111111111111111;
         const result = utils.toISOString(bigInt);
@@ -231,62 +263,71 @@ describe('Utility Methods', () => {
         done();
     });
 
-    it('should return false if browser is not android', (done) => {
+    it('should return false if browser is not android', done => {
         global.navigator = {
-            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.96 Safari/537.36',
+            userAgent:
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.96 Safari/537.36',
         };
         assert.equal(utils.isAndroidBrowser(), false);
         done();
     });
 
-    it('should return true if browser is android', (done) => {
+    it('should return true if browser is android', done => {
         global.navigator = {
-            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Android /58.0.3029.96 Safari/537.36',
+            userAgent:
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Android /58.0.3029.96 Safari/537.36',
         };
         assert.equal(utils.isAndroidBrowser(), true);
         done();
     });
 
-    it('should return false if not touch device', (done) => {
+    it('should return false if not touch device', done => {
         assert(!utils.isTouchDevice());
         done();
     });
 
-    it('should check if element is in viewport', (done) => {
+    it('should check if element is in viewport', done => {
         const el = $('<div>some text</div>');
         assert(utils.isElementInViewport(el));
         done();
     });
 
-    it('should get empty object for url params', (done) => {
+    it('should get empty object for url params', done => {
         const params = utils.params();
         assert.equal(Object.keys(params), 0);
         done();
     });
 
-    it('should get url params', (done) => {
-        const params = utils.params({ url: 'http://nodebb.org?foo=1&bar=test&herp=2' });
+    it('should get url params', done => {
+        const params = utils.params({
+            url: 'http://nodebb.org?foo=1&bar=test&herp=2',
+        });
         assert.strictEqual(params.foo, 1);
         assert.strictEqual(params.bar, 'test');
         assert.strictEqual(params.herp, 2);
         done();
     });
 
-    it('should get url params as arrays', (done) => {
-        const params = utils.params({ url: 'http://nodebb.org?foo=1&bar=test&herp[]=2&herp[]=3' });
+    it('should get url params as arrays', done => {
+        const params = utils.params({
+            url: 'http://nodebb.org?foo=1&bar=test&herp[]=2&herp[]=3',
+        });
         assert.strictEqual(params.foo, 1);
         assert.strictEqual(params.bar, 'test');
         assert.deepStrictEqual(params.herp, [2, 3]);
         done();
     });
 
-    it('should get a single param', (done) => {
+    it('should get a single param', done => {
         assert.equal(utils.param('somekey'), undefined);
         done();
     });
 
     it('should get the full URLSearchParams object', async () => {
-        const params = utils.params({ url: 'http://nodebb.org?foo=1&bar=test&herp[]=2&herp[]=3', full: true });
+        const params = utils.params({
+            url: 'http://nodebb.org?foo=1&bar=test&herp[]=2&herp[]=3',
+            full: true,
+        });
         assert(params instanceof URLSearchParams);
         assert.strictEqual(params.get('foo'), '1');
         assert.strictEqual(params.get('bar'), 'test');
@@ -294,33 +335,33 @@ describe('Utility Methods', () => {
     });
 
     describe('toType', () => {
-        it('should return param as is if not string', (done) => {
+        it('should return param as is if not string', done => {
             assert.equal(123, utils.toType(123));
             done();
         });
 
-        it('should convert return string numbers as numbers', (done) => {
+        it('should convert return string numbers as numbers', done => {
             assert.equal(123, utils.toType('123'));
             done();
         });
 
-        it('should convert string "false" to boolean false', (done) => {
+        it('should convert string "false" to boolean false', done => {
             assert.strictEqual(false, utils.toType('false'));
             done();
         });
 
-        it('should convert string "true" to boolean true', (done) => {
+        it('should convert string "true" to boolean true', done => {
             assert.strictEqual(true, utils.toType('true'));
             done();
         });
 
-        it('should parse json', (done) => {
+        it('should parse json', done => {
             const data = utils.toType('{"a":"1"}');
             assert.equal(data.a, '1');
             done();
         });
 
-        it('should return string as is if its not json,true,false or number', (done) => {
+        it('should return string as is if its not json,true,false or number', done => {
             const regularStr = 'this is a regular string';
             assert.equal(regularStr, utils.toType(regularStr));
             done();
@@ -330,23 +371,23 @@ describe('Utility Methods', () => {
     describe('utils.props', () => {
         const data = {};
 
-        it('should set nested data', (done) => {
+        it('should set nested data', done => {
             assert.equal(10, utils.props(data, 'a.b.c.d', 10));
             done();
         });
 
-        it('should return nested object', (done) => {
+        it('should return nested object', done => {
             const obj = utils.props(data, 'a.b.c');
             assert.equal(obj.d, 10);
             done();
         });
 
-        it('should returned undefined without throwing', (done) => {
+        it('should returned undefined without throwing', done => {
             assert.equal(utils.props(data, 'a.b.c.foo.bar'), undefined);
             done();
         });
 
-        it('should return undefined if second param is null', (done) => {
+        it('should return undefined if second param is null', done => {
             assert.equal(utils.props(undefined, null), undefined);
             done();
         });
@@ -356,25 +397,25 @@ describe('Utility Methods', () => {
         const target = { host: '', protocol: 'https' };
         const reference = { host: '', protocol: 'https' };
 
-        it('should return true if they match', (done) => {
+        it('should return true if they match', done => {
             assert(utils.isInternalURI(target, reference, ''));
             done();
         });
 
-        it('should return true if they match', (done) => {
+        it('should return true if they match', done => {
             target.host = 'nodebb.org';
             reference.host = 'nodebb.org';
             assert(utils.isInternalURI(target, reference, ''));
             done();
         });
 
-        it('should handle relative path', (done) => {
+        it('should handle relative path', done => {
             target.pathname = '/forum';
             assert(utils.isInternalURI(target, reference, '/forum'));
             done();
         });
 
-        it('should return false if they do not match', (done) => {
+        it('should return false if they do not match', done => {
             target.pathname = '';
             reference.host = 'designcreateplay.com';
             assert(!utils.isInternalURI(target, reference));
@@ -382,19 +423,19 @@ describe('Utility Methods', () => {
         });
     });
 
-    it('escape html', (done) => {
+    it('escape html', done => {
         const escaped = utils.escapeHTML('&<>');
         assert.equal(escaped, '&amp;&lt;&gt;');
         done();
     });
 
-    it('should escape regex chars', (done) => {
+    it('should escape regex chars', done => {
         const escaped = utils.escapeRegexChars('some text {}');
         assert.equal(escaped, 'some\\ text\\ \\{\\}');
         done();
     });
 
-    it('should get hours array', (done) => {
+    it('should get hours array', done => {
         const currentHour = new Date().getHours();
         const hours = utils.getHoursArray();
         let index = hours.length - 1;
@@ -406,27 +447,43 @@ describe('Utility Methods', () => {
         done();
     });
 
-    it('should get days array', (done) => {
+    it('should get days array', done => {
         const currentDay = new Date(Date.now()).getTime();
         const days = utils.getDaysArray();
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const months = [
+            'Jan',
+            'Feb',
+            'Mar',
+            'Apr',
+            'May',
+            'Jun',
+            'Jul',
+            'Aug',
+            'Sep',
+            'Oct',
+            'Nov',
+            'Dec',
+        ];
         let index = 0;
         for (let x = 29; x >= 0; x -= 1) {
-            const tmpDate = new Date(currentDay - (1000 * 60 * 60 * 24 * x));
-            assert.equal(`${months[tmpDate.getMonth()]} ${tmpDate.getDate()}`, days[index]);
+            const tmpDate = new Date(currentDay - 1000 * 60 * 60 * 24 * x);
+            assert.equal(
+                `${months[tmpDate.getMonth()]} ${tmpDate.getDate()}`,
+                days[index],
+            );
             index += 1;
         }
         done();
     });
 
-    it('`utils.rtrim` should remove trailing space', (done) => {
+    it('`utils.rtrim` should remove trailing space', done => {
         assert.strictEqual(utils.rtrim('  thing   '), '  thing');
         assert.strictEqual(utils.rtrim('\tthing\t\t'), '\tthing');
         assert.strictEqual(utils.rtrim('\t thing \t'), '\t thing');
         done();
     });
 
-    it('should profile function', (done) => {
+    it('should profile function', done => {
         const st = process.hrtime();
         setTimeout(() => {
             process.profile('it took', st);
@@ -442,7 +499,9 @@ describe('Utility Methods', () => {
             user1: user.getUserData(uid1),
             user2: user.getUserData(uid2),
         });
-        assert(result.hasOwnProperty('user1') && result.hasOwnProperty('user2'));
+        assert(
+            result.hasOwnProperty('user1') && result.hasOwnProperty('user2'),
+        );
         assert.strictEqual(result.user1.uid, uid1);
         assert.strictEqual(result.user2.uid, uid2);
     });

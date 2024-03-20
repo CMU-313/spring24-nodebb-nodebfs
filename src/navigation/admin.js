@@ -42,17 +42,27 @@ admin.getAdmin = async function () {
     return { enabled: enabled, available: available };
 };
 
-const fieldsToEscape = ['iconClass', 'class', 'route', 'id', 'text', 'textClass', 'title'];
+const fieldsToEscape = [
+    'iconClass',
+    'class',
+    'route',
+    'id',
+    'text',
+    'textClass',
+    'title',
+];
 
 admin.escapeFields = navItems => toggleEscape(navItems, true);
 admin.unescapeFields = navItems => toggleEscape(navItems, false);
 
 function toggleEscape(navItems, flag) {
-    navItems.forEach((item) => {
+    navItems.forEach(item => {
         if (item) {
-            fieldsToEscape.forEach((field) => {
+            fieldsToEscape.forEach(field => {
                 if (item.hasOwnProperty(field)) {
-                    item[field] = validator[flag ? 'escape' : 'unescape'](String(item[field]));
+                    item[field] = validator[flag ? 'escape' : 'unescape'](
+                        String(item[field]),
+                    );
                 }
             });
         }
@@ -65,7 +75,7 @@ admin.get = async function () {
     }
     const ids = await db.getSortedSetRange('navigation:enabled', 0, -1);
     const data = await db.getObjects(ids.map(id => `navigation:enabled:${id}`));
-    cache = data.map((item) => {
+    cache = data.map(item => {
         if (item.hasOwnProperty('groups')) {
             try {
                 item.groups = JSON.parse(item.groups);
@@ -86,14 +96,17 @@ admin.get = async function () {
 };
 
 async function getAvailable() {
-    const core = require('../../install/data/navigation.json').map((item) => {
+    const core = require('../../install/data/navigation.json').map(item => {
         item.core = true;
         item.id = item.id || '';
         return item;
     });
 
-    const navItems = await plugins.hooks.fire('filter:navigation.available', core);
-    navItems.forEach((item) => {
+    const navItems = await plugins.hooks.fire(
+        'filter:navigation.available',
+        core,
+    );
+    navItems.forEach(item => {
         if (item && !item.hasOwnProperty('enabled')) {
             item.enabled = true;
         }

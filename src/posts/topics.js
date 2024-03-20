@@ -1,4 +1,3 @@
-
 'use strict';
 
 const topics = require('../topics');
@@ -16,8 +15,14 @@ module.exports = function (Posts) {
         const isArray = Array.isArray(pids);
         pids = isArray ? pids : [pids];
         const postData = await Posts.getPostsFields(pids, ['tid']);
-        const topicData = await topics.getTopicsFields(postData.map(t => t.tid), ['mainPid']);
-        const result = pids.map((pid, i) => parseInt(pid, 10) === parseInt(topicData[i].mainPid, 10));
+        const topicData = await topics.getTopicsFields(
+            postData.map(t => t.tid),
+            ['mainPid'],
+        );
+        const result = pids.map(
+            (pid, i) =>
+                parseInt(pid, 10) === parseInt(topicData[i].mainPid, 10),
+        );
         return isArray ? result : result[0];
     };
 
@@ -41,7 +46,9 @@ module.exports = function (Posts) {
 
         const paths = pids.map((pid, index) => {
             const slug = topicData[index] ? topicData[index].slug : null;
-            const postIndex = utils.isNumber(indices[index]) ? parseInt(indices[index], 10) + 1 : null;
+            const postIndex = utils.isNumber(indices[index])
+                ? parseInt(indices[index], 10) + 1
+                : null;
 
             if (slug && postIndex) {
                 return `/topic/${slug}/${postIndex}`;

@@ -47,7 +47,7 @@ module.exports = function (Posts) {
             throw new Error('[[error:invalid-pid]]');
         }
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        const pid = yield db.incrObjectField('global', 'nextPid');
+        const pid = (yield db.incrObjectField('global', 'nextPid'));
         let postData = {
             pid: pid,
             uid: uid,
@@ -66,12 +66,13 @@ module.exports = function (Posts) {
         if (data.handle && !parseInt(uid, 10)) {
             postData.handle = data.handle;
         }
-        let result = yield plugins.hooks.fire('filter:post.create', { post: postData, data: data });
+        let result = (yield plugins.hooks.fire('filter:post.create', { post: postData, data: data }));
         postData = result.post;
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         yield db.setObject(`post:${postData.pid}`, postData);
+        const topicData = 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        const topicData = yield topics.getTopicFields(tid, ['cid', 'pinned']);
+        (yield topics.getTopicFields(tid, ['cid', 'pinned']));
         postData.cid = topicData.cid;
         if (isAnon === true) {
             yield Promise.all([
@@ -107,9 +108,14 @@ module.exports = function (Posts) {
                 Posts.uploads.sync(postData.pid),
             ]);
         }
-        result = (yield plugins.hooks.fire('filter:post.get', { post: postData, uid: data.uid }));
+        result = (yield plugins.hooks.fire('filter:post.get', {
+            post: postData,
+            uid: data.uid,
+        }));
         result.post.isMain = isMain;
-        plugins.hooks.fire('action:post.save', { post: _.clone(result.post) }).catch((e) => console.error(e));
+        plugins.hooks
+            .fire('action:post.save', { post: _.clone(result.post) })
+            .catch((e) => console.error(e));
         return result.post;
     });
 };
