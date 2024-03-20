@@ -2,9 +2,6 @@
 	"env": {
 		"mocha": true
 	},
-
-	"extends": ["prettier"],
-
 	"rules": {
 		"no-unused-vars": "off"
 	}

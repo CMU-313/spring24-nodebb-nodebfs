@@ -119,10 +119,7 @@ async function getRoomMessages(uid, roomId) {
             data = data.concat(
                 messageData
                     .filter(m => m && m.fromuid === uid && !m.system)
-                    .map(m => ({
-                        content: m.content,
-                        timestamp: m.timestamp,
-                    })),
+                    .map(m => ({ content: m.content, timestamp: m.timestamp })),
             );
         },
         { batch: 500, interval: 1000 },

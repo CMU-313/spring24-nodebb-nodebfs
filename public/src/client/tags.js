@@ -7,7 +7,7 @@ define('forum/tags', ['forum/infinitescroll', 'alerts'], function (
     const Tags = {};
 
     Tags.init = function () {
-        app.enterRoom('tagfs');
+        app.enterRoom('tags');
         $('#tag-search').focus();
         $('#tag-search').on(
             'input propertychange',
