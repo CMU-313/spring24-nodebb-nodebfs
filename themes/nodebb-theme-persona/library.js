@@ -11,14 +11,24 @@ const library = module.exports;
 library.init = async function (params) {
     const { router, middleware } = params;
     const routeHelpers = require.main.require('./src/routes/helpers');
-    routeHelpers.setupAdminPageRoute(router, '/admin/plugins/persona', [], controllers.renderAdminPage);
+    routeHelpers.setupAdminPageRoute(
+        router,
+        '/admin/plugins/persona',
+        [],
+        controllers.renderAdminPage,
+    );
 
-    routeHelpers.setupPageRoute(router, '/user/:userslug/theme', [
-        middleware.exposeUid,
-        middleware.ensureLoggedIn,
-        middleware.canViewUsers,
-        middleware.checkAccountPermissions,
-    ], controllers.renderThemeSettings);
+    routeHelpers.setupPageRoute(
+        router,
+        '/user/:userslug/theme',
+        [
+            middleware.exposeUid,
+            middleware.ensureLoggedIn,
+            middleware.canViewUsers,
+            middleware.checkAccountPermissions,
+        ],
+        controllers.renderThemeSettings,
+    );
 };
 
 library.addAdminNavigation = async function (header) {
@@ -30,7 +40,7 @@ library.addAdminNavigation = async function (header) {
     return header;
 };
 
-library.addProfileItem = async (data) => {
+library.addProfileItem = async data => {
     data.links.push({
         id: 'theme',
         route: 'theme',
@@ -51,15 +61,24 @@ library.addProfileItem = async (data) => {
 library.defineWidgetAreas = async function (areas) {
     const locations = ['header', 'sidebar', 'footer'];
     const templates = [
-        'categories.tpl', 'category.tpl', 'topic.tpl', 'users.tpl',
-        'unread.tpl', 'recent.tpl', 'popular.tpl', 'top.tpl', 'tags.tpl', 'tag.tpl',
-        'login.tpl', 'register.tpl',
+        'categories.tpl',
+        'category.tpl',
+        'topic.tpl',
+        'users.tpl',
+        'unread.tpl',
+        'recent.tpl',
+        'popular.tpl',
+        'top.tpl',
+        'tags.tpl',
+        'tag.tpl',
+        'login.tpl',
+        'register.tpl',
     ];
     function capitalizeFirst(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
-    templates.forEach((template) => {
-        locations.forEach((location) => {
+    templates.forEach(template => {
+        locations.forEach(location => {
             areas.push({
                 name: `${capitalizeFirst(template.split('.')[0])} ${capitalizeFirst(location)}`,
                 template: template,

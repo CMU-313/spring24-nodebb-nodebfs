@@ -42,7 +42,11 @@ module.exports = function (Posts) {
         if (meta.config['downvote:disabled']) {
             throw new Error('[[error:downvoting-disabled]]');
         }
-        const canDownvote = await privileges.posts.can('posts:downvote', pid, uid);
+        const canDownvote = await privileges.posts.can(
+            'posts:downvote',
+            pid,
+            uid,
+        );
         if (!canDownvote) {
             throw new Error('[[error:no-privileges]]');
         }
@@ -77,7 +81,10 @@ module.exports = function (Posts) {
         if (parseInt(uid, 10) <= 0) {
             return { upvoted: false, downvoted: false };
         }
-        const hasVoted = await db.isMemberOfSets([`pid:${pid}:upvote`, `pid:${pid}:downvote`], uid);
+        const hasVoted = await db.isMemberOfSets(
+            [`pid:${pid}:upvote`, `pid:${pid}:downvote`],
+            uid,
+        );
         return { upvoted: hasVoted[0], downvoted: hasVoted[1] };
     };
 
@@ -88,7 +95,10 @@ module.exports = function (Posts) {
         }
         const upvoteSets = pids.map(pid => `pid:${pid}:upvote`);
         const downvoteSets = pids.map(pid => `pid:${pid}:downvote`);
-        const data = await db.isMemberOfSets(upvoteSets.concat(downvoteSets), uid);
+        const data = await db.isMemberOfSets(
+            upvoteSets.concat(downvoteSets),
+            uid,
+        );
         return {
             upvotes: data.slice(0, pids.length),
             downvotes: data.slice(pids.length, pids.length * 2),
@@ -100,7 +110,10 @@ module.exports = function (Posts) {
     };
 
     function voteInProgress(pid, uid) {
-        return Array.isArray(votesInProgress[uid]) && votesInProgress[uid].includes(parseInt(pid, 10));
+        return (
+            Array.isArray(votesInProgress[uid]) &&
+            votesInProgress[uid].includes(parseInt(pid, 10))
+        );
     }
 
     function putVoteInProgress(pid, uid) {
@@ -127,11 +140,11 @@ module.exports = function (Posts) {
     //  voteStatus: { upvoted: boolean, downvoted: boolean }): Promise<void>
     async function unvote(pid, uid, type, voteStatus) {
         // assert function parameter types in the body
-        assert(typeof (pid), 'string');
-        assert(typeof (uid), 'number');
-        assert(typeof (type), 'string');
+        assert(typeof pid, 'string');
+        assert(typeof uid, 'number');
+        assert(typeof type, 'string');
         // specifically, voteStatus is of type { upvoted: boolean, downvoted: boolean }
-        assert(typeof (voteStatus), 'object');
+        assert(typeof voteStatus, 'object');
 
         if (type === 'downvote' || type === 'upvote') {
             await checkVoteLimitation(pid, uid, type);
@@ -142,12 +155,18 @@ module.exports = function (Posts) {
         }
 
         // assert function return types in the body
-        assert(typeof (voteStatus.upvoted), 'boolean');
-        assert(typeof (pid), 'string');
-        assert(typeof (uid), 'number');
+        assert(typeof voteStatus.upvoted, 'boolean');
+        assert(typeof pid, 'string');
+        assert(typeof uid, 'number');
         // specifically, voteStatus is of type { upvoted: boolean, downvoted: boolean }
-        assert(typeof (voteStatus), 'object');
-        return await vote(voteStatus.upvoted ? 'downvote' : 'upvote', true, pid, uid, voteStatus);
+        assert(typeof voteStatus, 'object');
+        return await vote(
+            voteStatus.upvoted ? 'downvote' : 'upvote',
+            true,
+            pid,
+            uid,
+            voteStatus,
+        );
     }
 
     async function checkVoteLimitation(pid, uid, type) {
@@ -157,12 +176,18 @@ module.exports = function (Posts) {
             user.getUserField(uid, 'reputation'),
             Posts.getPostField(pid, 'uid'),
             db.getSortedSetRevRangeByScore(
-                `uid:${uid}:${type}`, 0, -1, '+inf', Date.now() - oneDay
+                `uid:${uid}:${type}`,
+                0,
+                -1,
+                '+inf',
+                Date.now() - oneDay,
             ),
         ]);
 
         if (reputation < meta.config[`min:rep:${type}`]) {
-            throw new Error(`[[error:not-enough-reputation-to-${type}, ${meta.config[`min:rep:${type}`]}]]`);
+            throw new Error(
+                `[[error:not-enough-reputation-to-${type}, ${meta.config[`min:rep:${type}`]}]]`,
+            );
         }
         const votesToday = meta.config[`${type}sPerDay`];
         if (votesToday && votedPidsToday.length >= votesToday) {
@@ -170,10 +195,16 @@ module.exports = function (Posts) {
         }
         const voterPerUserToday = meta.config[`${type}sPerUserPerDay`];
         if (voterPerUserToday) {
-            const postData = await Posts.getPostsFields(votedPidsToday, ['uid']);
-            const targetUpVotes = postData.filter(p => p.uid === targetUid).length;
+            const postData = await Posts.getPostsFields(votedPidsToday, [
+                'uid',
+            ]);
+            const targetUpVotes = postData.filter(
+                p => p.uid === targetUid,
+            ).length;
             if (targetUpVotes >= voterPerUserToday) {
-                throw new Error(`[[error:too-many-${type}s-today-user, ${voterPerUserToday}]]`);
+                throw new Error(
+                    `[[error:too-many-${type}s-today-user, ${voterPerUserToday}]]`,
+                );
             }
         }
     }
@@ -198,7 +229,10 @@ module.exports = function (Posts) {
         }
 
         const postData = await Posts.getPostFields(pid, ['pid', 'uid', 'tid']);
-        const newReputation = await user.incrementUserReputationBy(postData.uid, type === 'upvote' ? 1 : -1);
+        const newReputation = await user.incrementUserReputationBy(
+            postData.uid,
+            type === 'upvote' ? 1 : -1,
+        );
 
         await adjustPostVotes(postData, uid, type, unvote);
 
@@ -218,9 +252,11 @@ module.exports = function (Posts) {
     async function fireVoteHook(postData, uid, type, unvote, voteStatus) {
         let hook = type;
         let current = voteStatus.upvoted ? 'upvote' : 'downvote';
-        if (unvote) { // e.g. unvoting, removing a upvote or downvote
+        if (unvote) {
+            // e.g. unvoting, removing a upvote or downvote
             hook = 'unvote';
-        } else { // e.g. User *has not* voted, clicks upvote or downvote
+        } else {
+            // e.g. User *has not* voted, clicks upvote or downvote
             current = 'unvote';
         }
         // action:post.upvote
@@ -235,7 +271,7 @@ module.exports = function (Posts) {
     }
 
     async function adjustPostVotes(postData, uid, type, unvote) {
-        const notType = (type === 'upvote' ? 'downvote' : 'upvote');
+        const notType = type === 'upvote' ? 'downvote' : 'upvote';
         if (unvote) {
             await db.setRemove(`pid:${postData.pid}:${type}`, uid);
         } else {
@@ -258,10 +294,19 @@ module.exports = function (Posts) {
             return;
         }
         const threshold = meta.config['flags:autoFlagOnDownvoteThreshold'];
-        if (threshold && postData.votes <= (-threshold)) {
+        if (threshold && postData.votes <= -threshold) {
             const adminUid = await user.getFirstAdminUid();
-            const reportMsg = await translator.translate(`[[flags:auto-flagged, ${-postData.votes}]]`);
-            const flagObj = await flags.create('post', postData.pid, adminUid, reportMsg, null, true);
+            const reportMsg = await translator.translate(
+                `[[flags:auto-flagged, ${-postData.votes}]]`,
+            );
+            const flagObj = await flags.create(
+                'post',
+                postData.pid,
+                adminUid,
+                reportMsg,
+                null,
+                true,
+            );
             await flags.notify(flagObj, adminUid, true);
         }
         await Promise.all([
@@ -272,22 +317,39 @@ module.exports = function (Posts) {
                 downvotes: postData.downvotes,
             }),
         ]);
-        plugins.hooks.fire('action:post.updatePostVoteCount', { post: postData });
+        plugins.hooks.fire('action:post.updatePostVoteCount', {
+            post: postData,
+        });
     };
 
     async function updateTopicVoteCount(postData) {
-        const topicData = await topics.getTopicFields(postData.tid, ['mainPid', 'cid', 'pinned']);
+        const topicData = await topics.getTopicFields(postData.tid, [
+            'mainPid',
+            'cid',
+            'pinned',
+        ]);
 
         if (postData.uid) {
             if (postData.votes !== 0) {
-                await db.sortedSetAdd(`cid:${topicData.cid}:uid:${postData.uid}:pids:votes`, postData.votes, postData.pid);
+                await db.sortedSetAdd(
+                    `cid:${topicData.cid}:uid:${postData.uid}:pids:votes`,
+                    postData.votes,
+                    postData.pid,
+                );
             } else {
-                await db.sortedSetRemove(`cid:${topicData.cid}:uid:${postData.uid}:pids:votes`, postData.pid);
+                await db.sortedSetRemove(
+                    `cid:${topicData.cid}:uid:${postData.uid}:pids:votes`,
+                    postData.pid,
+                );
             }
         }
 
         if (parseInt(topicData.mainPid, 10) !== parseInt(postData.pid, 10)) {
-            return await db.sortedSetAdd(`tid:${postData.tid}:posts:votes`, postData.votes, postData.pid);
+            return await db.sortedSetAdd(
+                `tid:${postData.tid}:posts:votes`,
+                postData.votes,
+                postData.pid,
+            );
         }
         const promises = [
             topics.setTopicFields(postData.tid, {
@@ -297,7 +359,13 @@ module.exports = function (Posts) {
             db.sortedSetAdd('topics:votes', postData.votes, postData.tid),
         ];
         if (!topicData.pinned) {
-            promises.push(db.sortedSetAdd(`cid:${topicData.cid}:tids:votes`, postData.votes, postData.tid));
+            promises.push(
+                db.sortedSetAdd(
+                    `cid:${topicData.cid}:tids:votes`,
+                    postData.votes,
+                    postData.tid,
+                ),
+            );
         }
         await Promise.all(promises);
     }

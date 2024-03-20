@@ -21,9 +21,13 @@ $(document).ready(function () {
             let preference = ['xs', 'sm'];
 
             try {
-                preference = JSON.parse(Storage.getItem('persona:navbar:autohide')) || preference;
+                preference =
+                    JSON.parse(Storage.getItem('persona:navbar:autohide')) ||
+                    preference;
             } catch (e) {
-                console.warn('[persona/settings] Unable to parse value for navbar autohiding');
+                console.warn(
+                    '[persona/settings] Unable to parse value for navbar autohiding',
+                );
             }
             var env = utils.findBootstrapEnvironment();
             // if env didn't change don't destroy and recreate
@@ -32,11 +36,13 @@ $(document).ready(function () {
             }
             lastBSEnv = env;
             var navbarEl = $('.navbar-fixed-top');
-            navbarEl.autoHidingNavbar('destroy').removeData('plugin_autoHidingNavbar');
+            navbarEl
+                .autoHidingNavbar('destroy')
+                .removeData('plugin_autoHidingNavbar');
             navbarEl.css('top', '');
 
             hooks
-                .on('filter:navigator.scroll', (data) => {
+                .on('filter:navigator.scroll', data => {
                     navbarEl.autoHidingNavbar('setDisableAutohide', true);
                     return data;
                 })
@@ -44,36 +50,40 @@ $(document).ready(function () {
                     navbarEl.autoHidingNavbar('setDisableAutohide', false);
                 });
 
-            hooks.fire('filter:persona.configureNavbarHiding', {
-                resizeEnvs: preference,
-            }).then(({ resizeEnvs }) => {
-                if (resizeEnvs.includes(env)) {
-                    navbarEl.autoHidingNavbar({
-                        showOnBottom: false,
-                    });
-                }
+            hooks
+                .fire('filter:persona.configureNavbarHiding', {
+                    resizeEnvs: preference,
+                })
+                .then(({ resizeEnvs }) => {
+                    if (resizeEnvs.includes(env)) {
+                        navbarEl.autoHidingNavbar({
+                            showOnBottom: false,
+                        });
+                    }
 
-                function fixTopCss(topValue) {
-                    if (ajaxify.data.template.topic) {
-                        $('.topic .topic-header').css({ top: topValue });
-                    } else {
-                        var topicListHeader = $('.topic-list-header');
-                        if (topicListHeader.length) {
-                            topicListHeader.css({ top: topValue });
+                    function fixTopCss(topValue) {
+                        if (ajaxify.data.template.topic) {
+                            $('.topic .topic-header').css({ top: topValue });
+                        } else {
+                            var topicListHeader = $('.topic-list-header');
+                            if (topicListHeader.length) {
+                                topicListHeader.css({ top: topValue });
+                            }
                         }
                     }
-                }
 
-                navbarEl.off('show.autoHidingNavbar')
-                    .on('show.autoHidingNavbar', function () {
-                        fixTopCss('');
-                    });
+                    navbarEl
+                        .off('show.autoHidingNavbar')
+                        .on('show.autoHidingNavbar', function () {
+                            fixTopCss('');
+                        });
 
-                navbarEl.off('hide.autoHidingNavbar')
-                    .on('hide.autoHidingNavbar', function () {
-                        fixTopCss('0px');
-                    });
-            });
+                    navbarEl
+                        .off('hide.autoHidingNavbar')
+                        .on('hide.autoHidingNavbar', function () {
+                            fixTopCss('0px');
+                        });
+                });
         });
     }
 
@@ -99,18 +109,21 @@ $(document).ready(function () {
     }
 
     function setupTaskbar() {
-        require(['hooks'], (hooks) => {
-            hooks.on('filter:taskbar.push', (data) => {
+        require(['hooks'], hooks => {
+            hooks.on('filter:taskbar.push', data => {
                 data.options.className = 'taskbar-' + data.module;
                 if (data.module === 'composer') {
                     data.options.icon = 'fa-commenting-o';
                 } else if (data.module === 'chat') {
-                    if (data.element.length && !data.element.hasClass('active')) {
+                    if (
+                        data.element.length &&
+                        !data.element.hasClass('active')
+                    ) {
                         increaseChatCount(data.element);
                     }
                 }
             });
-            hooks.on('action:taskbar.pushed', (data) => {
+            hooks.on('action:taskbar.pushed', data => {
                 if (data.module === 'chat') {
                     createChatIcon(data);
                     var elData = data.element.data();
@@ -128,24 +141,37 @@ $(document).ready(function () {
         });
 
         function createChatIcon(data) {
-            $.getJSON(config.relative_path + '/api/user/' + app.user.userslug + '/chats/' + data.options.roomId, function (chatObj) {
-                var el = $('#taskbar [data-uuid="' + data.uuid + '"] a');
-                el.parent('[data-uuid]').attr('data-roomId', data.options.roomId);
+            $.getJSON(
+                config.relative_path +
+                    '/api/user/' +
+                    app.user.userslug +
+                    '/chats/' +
+                    data.options.roomId,
+                function (chatObj) {
+                    var el = $('#taskbar [data-uuid="' + data.uuid + '"] a');
+                    el.parent('[data-uuid]').attr(
+                        'data-roomId',
+                        data.options.roomId,
+                    );
 
-                if (chatObj.users.length === 1) {
-                    var user = chatObj.users[0];
-                    el.find('i').remove();
+                    if (chatObj.users.length === 1) {
+                        var user = chatObj.users[0];
+                        el.find('i').remove();
 
-                    if (user.picture) {
-                        el.css('background-image', 'url(' + user.picture + ')');
-                        el.css('background-size', 'cover');
-                    } else {
-                        el.css('background-color', user['icon:bgColor'])
-                            .text(user['icon:text'])
-                            .addClass('user-icon');
+                        if (user.picture) {
+                            el.css(
+                                'background-image',
+                                'url(' + user.picture + ')',
+                            );
+                            el.css('background-size', 'cover');
+                        } else {
+                            el.css('background-color', user['icon:bgColor'])
+                                .text(user['icon:text'])
+                                .addClass('user-icon');
+                        }
                     }
-                }
-            });
+                },
+            );
         }
 
         function increaseChatCount(el) {
@@ -165,17 +191,26 @@ $(document).ready(function () {
                 }
 
                 icon = el.closest('[data-pid]').find('.edit-icon').first();
-                icon.prop('title', el.text()).tooltip('fixTitle').removeClass('hidden');
+                icon.prop('title', el.text())
+                    .tooltip('fixTitle')
+                    .removeClass('hidden');
             });
         }
 
         $(window).on('action:posts.edited', function (ev, data) {
             var parent = $('[data-pid="' + data.post.pid + '"]');
             var icon = parent.find('.edit-icon').filter(function (index, el) {
-                return parseInt($(el).closest('[data-pid]').attr('data-pid'), 10) === parseInt(data.post.pid, 10);
+                return (
+                    parseInt(
+                        $(el).closest('[data-pid]').attr('data-pid'),
+                        10,
+                    ) === parseInt(data.post.pid, 10)
+                );
             });
             var el = parent.find('[component="post/editor"]').first();
-            icon.prop('title', el.text()).tooltip('fixTitle').removeClass('hidden');
+            icon.prop('title', el.text())
+                .tooltip('fixTitle')
+                .removeClass('hidden');
         });
 
         $(window).on('action:topic.loaded', activateEditedTooltips);
@@ -187,7 +222,12 @@ $(document).ready(function () {
             return;
         }
 
-        require(['pulling/build/pulling-drawer', 'storage', 'alerts', 'search'], function (Pulling, Storage, alerts, search) {
+        require([
+            'pulling/build/pulling-drawer',
+            'storage',
+            'alerts',
+            'search',
+        ], function (Pulling, Storage, alerts, search) {
             if (!Pulling) {
                 return;
             }
@@ -232,7 +272,9 @@ $(document).ready(function () {
 
             function closeOnClick() {
                 navSlideout.close();
-                if (chatsSlideout) { chatsSlideout.close(); }
+                if (chatsSlideout) {
+                    chatsSlideout.close();
+                }
             }
 
             function onBeforeOpen() {
@@ -262,7 +304,9 @@ $(document).ready(function () {
 
             if (chatMenuVisible) {
                 chatsSlideout
-                    .ignore('code, code *, .preventSlideout, .preventSlideout *')
+                    .ignore(
+                        'code, code *, .preventSlideout, .preventSlideout *',
+                    )
                     .on('closed', onClose)
                     .on('beforeopen', onBeforeOpen)
                     .on('opened', function () {
@@ -277,24 +321,31 @@ $(document).ready(function () {
             });
 
             if (chatMenuVisible) {
-                navSlideout.on('beforeopen', function () {
-                    chatsSlideout.close();
-                    chatsSlideout.disable();
-                }).on('closed', function () {
-                    chatsSlideout.enable();
-                });
+                navSlideout
+                    .on('beforeopen', function () {
+                        chatsSlideout.close();
+                        chatsSlideout.disable();
+                    })
+                    .on('closed', function () {
+                        chatsSlideout.enable();
+                    });
             }
 
             $('#menu [data-section="navigation"] ul').html(
-                $('#main-nav').html() +
-                ($('#logged-out-menu').html() || '')
+                $('#main-nav').html() + ($('#logged-out-menu').html() || ''),
             );
 
-            $('#user-control-list').children().clone(true, true).appendTo($('#chats-menu [data-section="profile"] ul'));
+            $('#user-control-list')
+                .children()
+                .clone(true, true)
+                .appendTo($('#chats-menu [data-section="profile"] ul'));
 
             socket.on('event:user_status_change', function (data) {
                 if (parseInt(data.uid, 10) === app.user.uid) {
-                    app.updateUserStatus($('#chats-menu [component="user/status"]'), data.status);
+                    app.updateUserStatus(
+                        $('#chats-menu [component="user/status"]'),
+                        data.status,
+                    );
                     navSlideout.close();
                 }
             });
@@ -302,8 +353,13 @@ $(document).ready(function () {
             // right slideout notifications & chats menu
 
             function loadNotificationsAndChats() {
-                require(['notifications', 'chat'], function (notifications, chat) {
-                    const notifList = $('#chats-menu [data-section="notifications"] ul');
+                require(['notifications', 'chat'], function (
+                    notifications,
+                    chat,
+                ) {
+                    const notifList = $(
+                        '#chats-menu [data-section="notifications"] ul',
+                    );
                     notifications.loadNotifications(notifList, function () {
                         notifList.find('.deco-none').removeClass('deco-none');
                         chat.loadChatsDropdown($('#chats-menu .chat-list'));
@@ -312,10 +368,12 @@ $(document).ready(function () {
             }
 
             if (chatMenuVisible) {
-                $('#mobile-chats').removeClass('hidden').on('click', function () {
-                    navSlideout.close();
-                    chatsSlideout.enable().toggle();
-                });
+                $('#mobile-chats')
+                    .removeClass('hidden')
+                    .on('click', function () {
+                        navSlideout.close();
+                        chatsSlideout.enable().toggle();
+                    });
                 $('#chats-menu').on('click', 'li[data-roomid]', function () {
                     chatsSlideout.close();
                 });
@@ -330,10 +388,17 @@ $(document).ready(function () {
                     });
             }
 
-            const searchInputEl = $('.navbar-header .navbar-search input[name="term"]');
-            const searchButton = $('.navbar-header .navbar-search button[type="button"]');
+            const searchInputEl = $(
+                '.navbar-header .navbar-search input[name="term"]',
+            );
+            const searchButton = $(
+                '.navbar-header .navbar-search button[type="button"]',
+            );
             searchButton.off('click').on('click', function () {
-                if (!config.loggedIn && !app.user.privileges['search:content']) {
+                if (
+                    !config.loggedIn &&
+                    !app.user.privileges['search:content']
+                ) {
                     alerts.alert({
                         message: '[[error:search-requires-login]]',
                         timeout: 3000,
@@ -353,7 +418,9 @@ $(document).ready(function () {
             search.enableQuickSearch({
                 searchElements: {
                     inputEl: searchInputEl,
-                    resultEl: $('.navbar-header .navbar-search .quick-search-container'),
+                    resultEl: $(
+                        '.navbar-header .navbar-search .quick-search-container',
+                    ),
                 },
                 searchOptions: {
                     in: config.searchDefaultInQuick,
@@ -364,13 +431,20 @@ $(document).ready(function () {
 
     function setupHoverCards() {
         require(['components'], function (components) {
-            components.get('topic')
-                .on('click', '[component="user/picture"],[component="user/status"]', generateUserCard);
+            components
+                .get('topic')
+                .on(
+                    'click',
+                    '[component="user/picture"],[component="user/status"]',
+                    generateUserCard,
+                );
         });
 
         $(window).on('action:posts.loading', function (ev, data) {
             for (var i = 0, ii = data.posts.length; i < ii; i++) {
-                (ajaxify.data.topics || ajaxify.data.posts)[data.posts[i].index] = data.posts[i];
+                (ajaxify.data.topics || ajaxify.data.posts)[
+                    data.posts[i].index
+                ] = data.posts[i];
             }
         });
     }
@@ -378,7 +452,7 @@ $(document).ready(function () {
     function generateUserCard(ev) {
         var avatar = $(this);
         var uid = avatar.parents('[data-uid]').attr('data-uid');
-        var data = (ajaxify.data.topics || ajaxify.data.posts);
+        var data = ajaxify.data.topics || ajaxify.data.posts;
 
         for (var i = 0, ii = data.length; i < ii; i++) {
             if (parseInt(data[i].uid, 10) === parseInt(uid, 10)) {
@@ -393,39 +467,57 @@ $(document).ready(function () {
             return false;
         }
 
-        socket.emit('user.isFollowing', { uid: data.uid }, function (err, isFollowing) {
-            if (err) {
-                return err;
-            }
-
-            app.parseAndTranslate('modules/usercard', data, function (html) {
-                var card = $(html);
-                avatar.parents('a').after(card.hide());
-
-                if (parseInt(app.user.uid, 10) === parseInt(data.uid, 10) || !app.user.uid) {
-                    card.find('.btn-morph').hide();
-                } else {
-                    setupFavouriteMorph(card, data.uid, data.username);
-
-                    if (isFollowing) {
-                        $('.btn-morph').addClass('heart');
-                    } else {
-                        $('.btn-morph').addClass('plus');
-                    }
+        socket.emit(
+            'user.isFollowing',
+            { uid: data.uid },
+            function (err, isFollowing) {
+                if (err) {
+                    return err;
                 }
 
-                utils.makeNumbersHumanReadable(card.find('.human-readable-number'));
-                setupCardRemoval(card);
-                card.fadeIn();
-            });
-        });
+                app.parseAndTranslate(
+                    'modules/usercard',
+                    data,
+                    function (html) {
+                        var card = $(html);
+                        avatar.parents('a').after(card.hide());
+
+                        if (
+                            parseInt(app.user.uid, 10) ===
+                                parseInt(data.uid, 10) ||
+                            !app.user.uid
+                        ) {
+                            card.find('.btn-morph').hide();
+                        } else {
+                            setupFavouriteMorph(card, data.uid, data.username);
+
+                            if (isFollowing) {
+                                $('.btn-morph').addClass('heart');
+                            } else {
+                                $('.btn-morph').addClass('plus');
+                            }
+                        }
+
+                        utils.makeNumbersHumanReadable(
+                            card.find('.human-readable-number'),
+                        );
+                        setupCardRemoval(card);
+                        card.fadeIn();
+                    },
+                );
+            },
+        );
 
         ev.preventDefault();
         return false;
     }
 
     function setupFavouriteButtonOnProfile() {
-        setupFavouriteMorph($('[component="account/cover"]'), ajaxify.data.uid, ajaxify.data.username);
+        setupFavouriteMorph(
+            $('[component="account/cover"]'),
+            ajaxify.data.uid,
+            ajaxify.data.username,
+        );
     }
 
     function setupCardRemoval(card) {
@@ -449,19 +541,26 @@ $(document).ready(function () {
                 var method = $(this).hasClass('plus') ? 'put' : 'del';
 
                 api[method]('/users/' + uid + '/follow').then(() => {
-                    alerts.success('[[global:alert.' + type + ', ' + username + ']]');
+                    alerts.success(
+                        '[[global:alert.' + type + ', ' + username + ']]',
+                    );
                 });
 
                 $(this).toggleClass('plus').toggleClass('heart');
-                $(this).translateAttr('title', type === 'follow' ? '[[global:unfollow]]' : '[[global:follow]]');
+                $(this).translateAttr(
+                    'title',
+                    type === 'follow'
+                        ? '[[global:unfollow]]'
+                        : '[[global:follow]]',
+                );
 
                 if ($(this).find('b.drop').length === 0) {
                     $(this).prepend('<b class="drop"></b>');
                 }
 
                 var drop = $(this).find('b.drop').removeClass('animate');
-                var x = ev.pageX - (drop.width() / 2) - $(this).offset().left;
-                var y = ev.pageY - (drop.height() / 2) - $(this).offset().top;
+                var x = ev.pageX - drop.width() / 2 - $(this).offset().left;
+                var y = ev.pageY - drop.height() / 2 - $(this).offset().top;
 
                 drop.css({ top: y + 'px', left: x + 'px' }).addClass('animate');
             });

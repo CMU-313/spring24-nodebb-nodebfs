@@ -23,11 +23,11 @@ pubsub.on('sync:stats:start', () => {
     });
 });
 
-pubsub.on('sync:stats:end', (data) => {
+pubsub.on('sync:stats:end', data => {
     stats[data.id] = data.stats;
 });
 
-pubsub.on('sync:stats:guests', (eventId) => {
+pubsub.on('sync:stats:guests', eventId => {
     const Sockets = require('../index');
     const guestCount = Sockets.getCountInRoom('online_guests');
     pubsub.publish(eventId, guestCount);
@@ -36,7 +36,7 @@ pubsub.on('sync:stats:guests', (eventId) => {
 SocketRooms.getTotalGuestCount = function (callback) {
     let count = 0;
     const eventId = `sync:stats:guests:end:${utils.generateUUID()}`;
-    pubsub.on(eventId, (guestCount) => {
+    pubsub.on(eventId, guestCount => {
         count += guestCount;
     });
 
@@ -47,7 +47,6 @@ SocketRooms.getTotalGuestCount = function (callback) {
         callback(null, count);
     }, 100);
 };
-
 
 SocketRooms.getAll = async function () {
     pubsub.publish('sync:stats:start');
@@ -74,14 +73,17 @@ SocketRooms.getAll = async function () {
         totals.users.topics += instance.users.topics;
         totals.users.category += instance.users.category;
 
-        instance.topics.forEach((topic) => {
-            totals.topics[topic.tid] = totals.topics[topic.tid] || { count: 0, tid: topic.tid };
+        instance.topics.forEach(topic => {
+            totals.topics[topic.tid] = totals.topics[topic.tid] || {
+                count: 0,
+                tid: topic.tid,
+            };
             totals.topics[topic.tid].count += topic.count;
         });
     }
 
     let topTenTopics = [];
-    Object.keys(totals.topics).forEach((tid) => {
+    Object.keys(totals.topics).forEach(tid => {
         topTenTopics.push({ tid: tid, count: totals.topics[tid].count || 0 });
     });
 
@@ -150,7 +152,9 @@ SocketRooms.getLocalStats = function () {
             }
         }
 
-        topTenTopics = topTenTopics.sort((a, b) => b.count - a.count).slice(0, 10);
+        topTenTopics = topTenTopics
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 10);
         socketData.topics = topTenTopics;
     }
 

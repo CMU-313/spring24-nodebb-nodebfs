@@ -49,15 +49,20 @@ async function saveConditions(data) {
     await db.delete('conditions:active');
     const conditions = [];
 
-    data.forEach((reward) => {
+    data.forEach(reward => {
         conditions.push(reward.condition);
-        rewardsPerCondition[reward.condition] = rewardsPerCondition[reward.condition] || [];
+        rewardsPerCondition[reward.condition] =
+            rewardsPerCondition[reward.condition] || [];
         rewardsPerCondition[reward.condition].push(reward.id);
     });
 
     await db.setAdd('conditions:active', conditions);
 
-    await Promise.all(Object.keys(rewardsPerCondition).map(c => db.setAdd(`condition:${c}:rewards`, rewardsPerCondition[c])));
+    await Promise.all(
+        Object.keys(rewardsPerCondition).map(c =>
+            db.setAdd(`condition:${c}:rewards`, rewardsPerCondition[c]),
+        ),
+    );
 }
 
 async function getActiveRewards() {

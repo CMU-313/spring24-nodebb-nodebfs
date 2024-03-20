@@ -16,5 +16,3 @@ import cssWorkerUrl from 'file-loader!ace-builds/src-noconflict/worker-css';
 ace.config.setModuleUrl('ace/mode/html_worker', htmlWorkerUrl);
 ace.config.setModuleUrl('ace/mode/javascript_worker', javascriptWorkerUrl);
 ace.config.setModuleUrl('ace/mode/css_worker', cssWorkerUrl);
-
-

@@ -41,7 +41,11 @@ Plugins.orderActivePlugins = async function (socket, data) {
         throw new Error('[[error:plugins-set-in-configuration]]');
     }
     data = data.filter(plugin => plugin && plugin.name);
-    await Promise.all(data.map(plugin => db.sortedSetAdd('plugins:active', plugin.order || 0, plugin.name)));
+    await Promise.all(
+        data.map(plugin =>
+            db.sortedSetAdd('plugins:active', plugin.order || 0, plugin.name),
+        ),
+    );
 };
 
 Plugins.upgrade = async function (socket, data) {

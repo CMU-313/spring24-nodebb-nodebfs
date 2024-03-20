@@ -21,7 +21,7 @@ app = window.app || {};
 Object.defineProperty(app, 'isFocused', {
     get() {
         return document.visibilityState === 'visible';
-    }
+    },
 });
 app.currentRoom = null;
 app.widgets = {};
@@ -29,7 +29,10 @@ app.flags = {};
 app.onDomReady = function () {
     $(document).ready(async function () {
         if (app.user.timeagoCode && app.user.timeagoCode !== 'en') {
-            await import(/* webpackChunkName: "timeago/[request]" */ 'timeago/locales/jquery.timeago.' + app.user.timeagoCode);
+            await import(
+                /* webpackChunkName: "timeago/[request]" */ 'timeago/locales/jquery.timeago.' +
+                    app.user.timeagoCode
+            );
         }
         app.load();
     });
@@ -67,7 +70,12 @@ if (document.readyState === 'loading') {
             const earlyClick = function (ev) {
                 let btnEl = ev.target.closest('button');
                 const anchorEl = ev.target.closest('a');
-                if (!btnEl && anchorEl && (anchorEl.getAttribute('data-ajaxify') === 'false' || anchorEl.href === '#')) {
+                if (
+                    !btnEl &&
+                    anchorEl &&
+                    (anchorEl.getAttribute('data-ajaxify') === 'false' ||
+                        anchorEl.href === '#')
+                ) {
                     btnEl = anchorEl;
                 }
                 if (btnEl && !earlyQueue.includes(btnEl)) {
@@ -108,7 +116,15 @@ if (document.readyState === 'loading') {
             'search',
             'forum/header',
             'hooks',
-        ], function (taskbar, helpers, pagination, messages, search, header, hooks) {
+        ], function (
+            taskbar,
+            helpers,
+            pagination,
+            messages,
+            search,
+            header,
+            hooks,
+        ) {
             header.prepareDOM();
             taskbar.init();
             helpers.register();
@@ -130,16 +146,28 @@ if (document.readyState === 'loading') {
             let _module;
             try {
                 switch (moduleName) {
-                    case 'bootbox': return require('bootbox');
-                    case 'benchpressjs': return require('benchpressjs');
-                    case 'clipboard': return require('clipboard');
+                    case 'bootbox':
+                        return require('bootbox');
+                    case 'benchpressjs':
+                        return require('benchpressjs');
+                    case 'clipboard':
+                        return require('clipboard');
                 }
                 if (moduleName.startsWith('admin')) {
-                    _module = await import(/* webpackChunkName: "admin/[request]" */ 'admin/' + moduleName.replace(/^admin\//, ''));
+                    _module = await import(
+                        /* webpackChunkName: "admin/[request]" */ 'admin/' +
+                            moduleName.replace(/^admin\//, '')
+                    );
                 } else if (moduleName.startsWith('forum')) {
-                    _module = await import(/* webpackChunkName: "forum/[request]" */ 'forum/' + moduleName.replace(/^forum\//, ''));
+                    _module = await import(
+                        /* webpackChunkName: "forum/[request]" */ 'forum/' +
+                            moduleName.replace(/^forum\//, '')
+                    );
                 } else {
-                    _module = await import(/* webpackChunkName: "modules/[request]" */ 'modules/' + moduleName);
+                    _module = await import(
+                        /* webpackChunkName: "modules/[request]" */ 'modules/' +
+                            moduleName
+                    );
                 }
             } catch (err) {
                 console.warn(`error loading ${moduleName}\n${err.stack}`);
@@ -148,61 +176,75 @@ if (document.readyState === 'loading') {
         }
         const result = await Promise.all(modules.map(requireModule));
         return single ? result.pop() : result;
-    }
+    };
 
     app.logout = function (redirect) {
-        console.warn('[deprecated] app.logout is deprecated, please use logout module directly');
+        console.warn(
+            '[deprecated] app.logout is deprecated, please use logout module directly',
+        );
         require(['logout'], function (logout) {
             logout(redirect);
         });
     };
 
     app.alert = function (params) {
-        console.warn('[deprecated] app.alert is deprecated, please use alerts.alert');
+        console.warn(
+            '[deprecated] app.alert is deprecated, please use alerts.alert',
+        );
         require(['alerts'], function (alerts) {
             alerts.alert(params);
         });
     };
 
     app.removeAlert = function (id) {
-        console.warn('[deprecated] app.removeAlert is deprecated, please use alerts.remove');
+        console.warn(
+            '[deprecated] app.removeAlert is deprecated, please use alerts.remove',
+        );
         require(['alerts'], function (alerts) {
             alerts.remove(id);
         });
     };
 
     app.alertSuccess = function (message, timeout) {
-        console.warn('[deprecated] app.alertSuccess is deprecated, please use alerts.success');
+        console.warn(
+            '[deprecated] app.alertSuccess is deprecated, please use alerts.success',
+        );
         require(['alerts'], function (alerts) {
             alerts.success(message, timeout);
         });
     };
 
     app.alertError = function (message, timeout) {
-        console.warn('[deprecated] app.alertError is deprecated, please use alerts.error');
+        console.warn(
+            '[deprecated] app.alertError is deprecated, please use alerts.error',
+        );
         require(['alerts'], function (alerts) {
             alerts.error(message, timeout);
         });
     };
 
     app.enterRoom = function (room, callback) {
-        callback = callback || function () { };
+        callback = callback || function () {};
         if (socket && app.user.uid && app.currentRoom !== room) {
             const previousRoom = app.currentRoom;
             app.currentRoom = room;
-            socket.emit('meta.rooms.enter', {
-                enter: room,
-            }, function (err) {
-                if (err) {
-                    app.currentRoom = previousRoom;
-                    require(['alerts'], function (alerts) {
-                        alerts.error(err);
-                    });
-                    return;
-                }
+            socket.emit(
+                'meta.rooms.enter',
+                {
+                    enter: room,
+                },
+                function (err) {
+                    if (err) {
+                        app.currentRoom = previousRoom;
+                        require(['alerts'], function (alerts) {
+                            alerts.error(err);
+                        });
+                        return;
+                    }
 
-                callback();
-            });
+                    callback();
+                },
+            );
         }
     };
 
@@ -227,11 +269,12 @@ if (document.readyState === 'loading') {
             .removeClass('active')
             .find('a')
             .filter(function (i, a) {
-                return $(a).attr('href') !== '#' && window.location.hostname === a.hostname &&
-                    (
-                        window.location.pathname === a.pathname ||
-                        window.location.pathname.startsWith(a.pathname + '/')
-                    );
+                return (
+                    $(a).attr('href') !== '#' &&
+                    window.location.hostname === a.hostname &&
+                    (window.location.pathname === a.pathname ||
+                        window.location.pathname.startsWith(a.pathname + '/'))
+                );
             })
             .parent()
             .addClass('active');
@@ -242,7 +285,9 @@ if (document.readyState === 'loading') {
             return;
         }
         els = els || $('body');
-        els.find('.avatar,img[title].teaser-pic,img[title].user-img,div.user-icon,span.user-icon').one('mouseenter', function (ev) {
+        els.find(
+            '.avatar,img[title].teaser-pic,img[title].user-img,div.user-icon,span.user-icon',
+        ).one('mouseenter', function (ev) {
             const $this = $(this);
             // perf: create tooltips on demand
             $this.tooltip({
@@ -275,47 +320,56 @@ if (document.readyState === 'loading') {
     };
 
     app.openChat = function (roomId, uid) {
-        console.warn('[deprecated] app.openChat is deprecated, please use chat.openChat');
+        console.warn(
+            '[deprecated] app.openChat is deprecated, please use chat.openChat',
+        );
         require(['chat'], function (chat) {
             chat.openChat(roomId, uid);
         });
     };
 
     app.newChat = function (touid, callback) {
-        console.warn('[deprecated] app.newChat is deprecated, please use chat.newChat');
+        console.warn(
+            '[deprecated] app.newChat is deprecated, please use chat.newChat',
+        );
         require(['chat'], function (chat) {
             chat.newChat(touid, callback);
         });
     };
 
     app.toggleNavbar = function (state) {
-        require(['components'], (components) => {
+        require(['components'], components => {
             const navbarEl = components.get('navbar');
             navbarEl[state ? 'show' : 'hide']();
         });
     };
 
     app.enableTopicSearch = function (options) {
-        console.warn('[deprecated] app.enableTopicSearch is deprecated, please use search.enableQuickSearch(options)');
+        console.warn(
+            '[deprecated] app.enableTopicSearch is deprecated, please use search.enableQuickSearch(options)',
+        );
         require(['search'], function (search) {
             search.enableQuickSearch(options);
         });
     };
 
     app.handleSearch = function (searchOptions) {
-        console.warn('[deprecated] app.handleSearch is deprecated, please use search.init(options)');
+        console.warn(
+            '[deprecated] app.handleSearch is deprecated, please use search.init(options)',
+        );
         require(['search'], function (search) {
             search.init(searchOptions);
         });
     };
 
     app.prepareSearch = function () {
-        console.warn('[deprecated] app.prepareSearch is deprecated, please use search.showAndFocusInput()');
+        console.warn(
+            '[deprecated] app.prepareSearch is deprecated, please use search.showAndFocusInput()',
+        );
         require(['search'], function (search) {
             search.showAndFocusInput();
         });
     };
-
 
     app.updateUserStatus = function (el, status) {
         if (!el.length) {
@@ -323,12 +377,15 @@ if (document.readyState === 'loading') {
         }
 
         require(['translator'], function (translator) {
-            translator.translate('[[global:' + status + ']]', function (translated) {
-                el.removeClass('online offline dnd away')
-                    .addClass(status)
-                    .attr('title', translated)
-                    .attr('data-original-title', translated);
-            });
+            translator.translate(
+                '[[global:' + status + ']]',
+                function (translated) {
+                    el.removeClass('online offline dnd away')
+                        .addClass(status)
+                        .attr('title', translated)
+                        .attr('data-original-title', translated);
+                },
+            );
         });
     };
 
@@ -364,13 +421,16 @@ if (document.readyState === 'loading') {
         }
 
         return new Promise((resolve, reject) => {
-            require(['translator', 'benchpress'], function (translator, Benchpress) {
+            require(['translator', 'benchpress'], function (
+                translator,
+                Benchpress,
+            ) {
                 Benchpress.render(template, data, blockName)
                     .then(rendered => translator.translate(rendered))
                     .then(translated => translator.unescape(translated))
                     .then(resolve, reject);
             });
-        }).then((html) => {
+        }).then(html => {
             html = $(html);
             if (callback && typeof callback === 'function') {
                 setTimeout(callback, 0, html);
@@ -383,12 +443,16 @@ if (document.readyState === 'loading') {
     function registerServiceWorker() {
         // Do not register for Safari browsers
         if (!config.useragent.isSafari && 'serviceWorker' in navigator) {
-            navigator.serviceWorker.register(config.relative_path + '/service-worker.js', { scope: config.relative_path + '/' })
+            navigator.serviceWorker
+                .register(config.relative_path + '/service-worker.js', {
+                    scope: config.relative_path + '/',
+                })
                 .then(function () {
                     console.info('ServiceWorker registration succeeded.');
-                }).catch(function (err) {
+                })
+                .catch(function (err) {
                     console.info('ServiceWorker registration failed: ', err);
                 });
         }
     }
-}());
+})();

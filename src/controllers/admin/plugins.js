@@ -15,17 +15,23 @@ pluginsController.get = async function (req, res) {
     ]);
 
     const compatiblePkgNames = compatible.map(pkgData => pkgData.name);
-    const installedPlugins = compatible.filter(plugin => plugin && plugin.installed);
-    const activePlugins = all.filter(plugin => plugin && plugin.installed && plugin.active);
+    const installedPlugins = compatible.filter(
+        plugin => plugin && plugin.installed,
+    );
+    const activePlugins = all.filter(
+        plugin => plugin && plugin.installed && plugin.active,
+    );
 
     const trendingScores = trending.reduce((memo, cur) => {
         memo[cur.label] = cur.value;
         return memo;
     }, {});
     const trendingPlugins = all
-        .filter(plugin => plugin && Object.keys(trendingScores).includes(plugin.id))
+        .filter(
+            plugin => plugin && Object.keys(trendingScores).includes(plugin.id),
+        )
         .sort((a, b) => trendingScores[b.id] - trendingScores[a.id])
-        .map((plugin) => {
+        .map(plugin => {
             plugin.downloads = trendingScores[plugin.id];
             return plugin;
         });
@@ -34,7 +40,10 @@ pluginsController.get = async function (req, res) {
         installed: installedPlugins,
         installedCount: installedPlugins.length,
         activeCount: activePlugins.length,
-        inactiveCount: Math.max(0, installedPlugins.length - activePlugins.length),
+        inactiveCount: Math.max(
+            0,
+            installedPlugins.length - activePlugins.length,
+        ),
         canChangeState: !nconf.get('plugins:active'),
         upgradeCount: compatible.reduce((count, current) => {
             if (current.installed && current.outdated) {
@@ -43,7 +52,9 @@ pluginsController.get = async function (req, res) {
             return count;
         }, 0),
         download: compatible.filter(plugin => !plugin.installed),
-        incompatible: all.filter(plugin => !compatiblePkgNames.includes(plugin.name)),
+        incompatible: all.filter(
+            plugin => !compatiblePkgNames.includes(plugin.name),
+        ),
         trending: trendingPlugins,
         submitPluginUsage: meta.config.submitPluginUsage,
         version: nconf.get('version'),

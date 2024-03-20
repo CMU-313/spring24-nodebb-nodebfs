@@ -11,10 +11,10 @@ const fork = require('./meta/debugFork');
 function forkChild(message, callback) {
     const child = fork(path.join(__dirname, 'password'));
 
-    child.on('message', (msg) => {
+    child.on('message', msg => {
         callback(msg.err ? new Error(msg.err) : null, msg.result);
     });
-    child.on('error', (err) => {
+    child.on('error', err => {
         console.error(err.stack);
         callback(err);
     });
@@ -26,7 +26,11 @@ const forkChildAsync = util.promisify(forkChild);
 
 exports.hash = async function (rounds, password) {
     password = crypto.createHash('sha512').update(password).digest('hex');
-    return await forkChildAsync({ type: 'hash', rounds: rounds, password: password });
+    return await forkChildAsync({
+        type: 'hash',
+        rounds: rounds,
+        password: password,
+    });
 };
 
 exports.compare = async function (password, hash, shaWrapped) {
@@ -36,7 +40,11 @@ exports.compare = async function (password, hash, shaWrapped) {
         password = crypto.createHash('sha512').update(password).digest('hex');
     }
 
-    return await forkChildAsync({ type: 'compare', password: password, hash: hash || fakeHash });
+    return await forkChildAsync({
+        type: 'compare',
+        password: password,
+        hash: hash || fakeHash,
+    });
 };
 
 let fakeHashCache;
@@ -49,7 +57,7 @@ async function getFakeHash() {
 }
 
 // child process
-process.on('message', (msg) => {
+process.on('message', msg => {
     if (msg.type === 'hash') {
         tryMethod(hashPassword, msg);
     } else if (msg.type === 'compare') {
@@ -75,7 +83,10 @@ async function hashPassword(msg) {
 }
 
 async function compare(msg) {
-    return await bcrypt.compare(String(msg.password || ''), String(msg.hash || ''));
+    return await bcrypt.compare(
+        String(msg.password || ''),
+        String(msg.hash || ''),
+    );
 }
 
 require('./promisify')(exports);
