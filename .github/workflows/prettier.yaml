@@ -1,4 +1,4 @@
-name: Lint
+name: Prettier
 
 on:
   push:
@@ -16,11 +16,11 @@ permissions:
   contents: read
 
 jobs:
-  lint:
+  prettier:
     permissions:
       checks: write # for coverallsapp/github-action to create new checks
       contents: read # for actions/checkout to fetch code
-    name: Lint
+    name: Prettier
     strategy:
       fail-fast: false
       matrix:
@@ -79,5 +79,5 @@ jobs:
         run: |
           node app --setup="${SETUP}" --ci="${CI}"
 
-      - name: Run ESLint
-        run: npm run lint
+      - name: Run Prettier
+        run: npm run prettier
