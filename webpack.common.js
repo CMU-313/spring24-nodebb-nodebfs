@@ -4,6 +4,7 @@ const path = require('path');
 const url = require('url');
 const nconf = require('nconf');
 
+// eslint-disable-next-line
 const activePlugins = require('./build/active_plugins.json');
 
 let relativePath = nconf.get('relative_path');
