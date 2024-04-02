@@ -79,7 +79,7 @@ jobs:
               "port": 27017,
               "database": "ci_test"
             }
-            TRANSLATOR_API: 'https://translator-service-z6qcfhwzta-uc.a.run.app'
+          TRANSLATOR_API: 'https://translator-service-z6qcfhwzta-uc.a.run.app'
         run: node -r ./fetch-polyfill.js app --setup="${SETUP}" --ci="${CI}"
 
       - name: Run ESLint
