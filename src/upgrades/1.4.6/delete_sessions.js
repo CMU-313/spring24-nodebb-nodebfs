@@ -8,14 +8,8 @@ module.exports = {
     name: 'Delete accidentally long-lived sessions',
     timestamp: Date.UTC(2017, 3, 16),
     method: async function () {
-        let configJSON;
-        try {
-            configJSON = require('../../../config.json') || {
-                [process.env.database]: true,
-            };
-        } catch (err) {
-            configJSON = { [process.env.database]: true };
-        }
+        const configJSON = { [process.env.database]: true };
+        
 
         const isRedisSessionStore = configJSON.hasOwnProperty('redis');
         const { progress } = this;
