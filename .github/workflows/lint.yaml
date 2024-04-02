@@ -47,6 +47,9 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
+      - name: Install node-fetch
+        run: npm install node-fetch
+
       - name: NPM Install
         uses: bahmutov/npm-install@v1
         with:
@@ -76,8 +79,7 @@ jobs:
               "port": 27017,
               "database": "ci_test"
             }
-        run: |
-          node app --setup="${SETUP}" --ci="${CI}"
+        run: node -r ./fetch-polyfill.js app --setup="${SETUP}" --ci="${CI}"
 
       - name: Run ESLint
         run: npm run lint

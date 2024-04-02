@@ -1,5 +1,7 @@
 'use strict'
 
+const fetch = require('node-fetch');
+
 const translatorApi = module.exports;
 
 translatorApi.translate = async function (postData) {
