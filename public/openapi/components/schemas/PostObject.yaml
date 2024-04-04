@@ -22,6 +22,7 @@ PostObject:
       type: number
     isEnglish:
       type: boolean
+      nullable: true
     translatedContent:
       type: string
     votes:
@@ -151,6 +152,3 @@ PostObject:
       type: boolean
     replies:
       type: number
-  required:
-    - isEnglish: false
-    - translatedContent: false

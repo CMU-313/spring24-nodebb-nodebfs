@@ -44,6 +44,7 @@ get:
                     type: number
                   isEnglish:
                     type: boolean
+                    nullable: true
                   upvotes:
                     type: number
                   downvotes:
@@ -71,9 +72,6 @@ get:
                   anonymous:
                     type: boolean
                     nullable: true
-                required:
-                  - isEnglish: false
-                  - translatedContent: false
 put:
   tags:
     - posts
