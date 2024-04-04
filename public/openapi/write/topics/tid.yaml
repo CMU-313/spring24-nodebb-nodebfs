@@ -25,7 +25,6 @@ get:
                 $ref: ../../components/schemas/TopicObject.yaml#/TopicObjectSlim
               isEnglish:
                 type: boolean
-                nullable: true
 post:
   tags:
     - topics
@@ -67,6 +66,8 @@ post:
                 $ref: ../../components/schemas/Status.yaml#/Status
               response:
                 $ref: ../../components/schemas/PostObject.yaml#/PostObject
+              isEnglish:
+                type: boolean
 delete:
   tags:
     - topics
