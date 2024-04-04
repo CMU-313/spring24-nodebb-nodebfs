@@ -25,7 +25,8 @@ get:
                 $ref: ../../components/schemas/TopicObject.yaml#/TopicObjectSlim
               isEnglish:
                 type: boolean
-                required: false
+            required:
+              - isEnglish: false
 post:
   tags:
     - topics
@@ -69,7 +70,8 @@ post:
                 $ref: ../../components/schemas/PostObject.yaml#/PostObject
               isEnglish:
                 type: boolean
-                required: false
+            required:
+              - isEnglish: false
 delete:
   tags:
     - topics
