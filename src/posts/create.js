@@ -37,8 +37,8 @@ module.exports = function (Posts) {
             tid: tid,
             content: content,
             timestamp: timestamp,
-            translatedContent: translatedContent ?? '',
-            isEnglish: isEnglish ?? false,
+            translatedContent: translatedContent,
+            isEnglish: isEnglish,
         };
 
         if (data.toPid) {
