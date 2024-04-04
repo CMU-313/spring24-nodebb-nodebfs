@@ -31,9 +31,11 @@ get:
               response:
                 $ref: ../../../../components/schemas/PostObject.yaml#/PostObject
               isEnglish:
-                type: boolean 
+                type: boolean
             required:
               - isEnglish: false
+              - status
+              - response
 put:
   tags:
     - posts
