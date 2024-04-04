@@ -30,10 +30,6 @@ get:
                 $ref: ../../../../components/schemas/Status.yaml#/Status
               response:
                 $ref: ../../../../components/schemas/PostObject.yaml#/PostObject
-              isEnglish:
-                type: boolean
-            required:
-              - isEnglish: false
 put:
   tags:
     - posts
