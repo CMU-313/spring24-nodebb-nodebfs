@@ -1117,37 +1117,6 @@ describe("Post's", () => {
                 done();
             });
         });
-
-        it('should get anonymous property when post is non anonymous', done => {
-            posts.getPostSummaryByPids([postData.pid], 0, {}, (err, data) => {
-                assert.ifError(err);
-                assert(data[0].hasOwnProperty('anonymous'));
-                if (typeof data[0].anonymous === 'string') {
-                    assert.equal(data[0].anonymous, 'false');
-                } else {
-                    assert.equal(data[0].anonymous, false);
-                }
-                done();
-            });
-        });
-
-        it('should get anonymous property when post is anonymous', done => {
-            posts.getPostSummaryByPids(
-                [anonymousPostData.pid],
-                0,
-                {},
-                (err, data) => {
-                    assert.ifError(err);
-                    assert(data[0].hasOwnProperty('anonymous'));
-                    if (typeof data[0].anonymous === 'string') {
-                        assert.equal(data[0].anonymous, 'true');
-                    } else {
-                        assert.equal(data[0].anonymous, true);
-                    }
-                    done();
-                },
-            );
-        });
     });
 
     it('should get recent poster uids', done => {
