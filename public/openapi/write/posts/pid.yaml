@@ -42,9 +42,6 @@ get:
                     type: number
                   deleted:
                     type: number
-                  isEnglish:
-                    type: boolean
-                    nullable: true
                   upvotes:
                     type: number
                   downvotes:

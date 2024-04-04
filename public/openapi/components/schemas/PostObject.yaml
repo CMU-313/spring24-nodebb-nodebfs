@@ -20,11 +20,6 @@ PostObject:
       type: number
     downvotes:
       type: number
-    isEnglish:
-      type: boolean
-      nullable: true
-    translatedContent:
-      type: string
     votes:
       type: number
     timestampISO:
@@ -113,7 +108,7 @@ PostObject:
         renamed:
           type: boolean
         tags:
-          type: array
+          type: arrayd
           items:
             $ref: ../../components/schemas/TagObject.yaml#/TagObject
       required:
