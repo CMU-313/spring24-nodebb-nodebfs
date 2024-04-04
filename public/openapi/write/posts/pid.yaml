@@ -34,6 +34,8 @@ get:
                     description: A topic identifier
                   content:
                     type: string
+                  translatedContent:
+                    type: string
                   timestamp:
                     type: number
                   flagId:
@@ -71,6 +73,7 @@ get:
                     nullable: true
                 required:
                   - isEnglish: false
+                  - translatedContent: false
 put:
   tags:
     - posts
