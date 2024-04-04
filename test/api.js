@@ -744,7 +744,7 @@ describe('API', async () => {
         // Compare the schema to the response
         required.forEach(prop => {
             if (schema.hasOwnProperty(prop)) {
-                if (prop == 'isEnglish' || prop == 'translatedContent') {
+                if (prop === 'isEnglish' || prop === 'translatedContent') {
                     return;
                 }
                 assert(
@@ -846,7 +846,7 @@ describe('API', async () => {
                 return;
             }
 
-            if (prop == 'isEnglish' || prop == 'translatedContent') {
+            if (prop === 'isEnglish' || prop === 'translatedContent') {
                 return;
             }
 
