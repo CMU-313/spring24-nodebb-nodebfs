@@ -20,6 +20,10 @@ PostObject:
       type: number
     downvotes:
       type: number
+    isEnglish:
+      type: boolean
+    translatedContent:
+      type: string
     votes:
       type: number
     timestampISO:
@@ -147,3 +151,6 @@ PostObject:
       type: boolean
     replies:
       type: number
+  required:
+    - isEnglish: false
+    - translatedContent: false

@@ -72,8 +72,6 @@ post:
                 type: boolean
             required:
               - isEnglish: false
-              - status
-              - response
 delete:
   tags:
     - topics

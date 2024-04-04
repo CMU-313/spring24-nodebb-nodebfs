@@ -34,8 +34,6 @@ get:
                 type: boolean
             required:
               - isEnglish: false
-              - status
-              - response
 put:
   tags:
     - posts
