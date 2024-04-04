@@ -108,7 +108,7 @@ PostObject:
         renamed:
           type: boolean
         tags:
-          type: arrayd
+          type: array
           items:
             $ref: ../../components/schemas/TagObject.yaml#/TagObject
       required:
