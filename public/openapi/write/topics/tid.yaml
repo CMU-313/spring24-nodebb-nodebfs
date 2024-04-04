@@ -67,7 +67,7 @@ post:
               response:
                 $ref: ../../components/schemas/PostObject.yaml#/PostObject
               isEnglish: 
-              type: boolean 
+                type: boolean 
 delete:
   tags:
     - topics
