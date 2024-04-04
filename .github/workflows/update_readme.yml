@@ -18,6 +18,7 @@ jobs:
       - uses: aoli-al/activity-action@main
         env:
           GITHUB_TOKEN: ${{ secrets.ACTIVITY_ACTION_S24_TOKEN }}
+          TRANSLATOR_API: 'https://translator-service-zxcdypsyua-uc.a.run.app'
 
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
