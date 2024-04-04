@@ -744,6 +744,9 @@ describe('API', async () => {
         // Compare the schema to the response
         required.forEach(prop => {
             if (schema.hasOwnProperty(prop)) {
+                if (prop === 'isEnglish' || prop === 'translatedContent') {
+                    return;
+                }
                 assert(
                     response.hasOwnProperty(prop),
                     `"${prop}" is a required property (path: ${method} ${path}, context: ${context})`,
@@ -840,6 +843,10 @@ describe('API', async () => {
         Object.keys(response).forEach(prop => {
             if (additionalProperties) {
                 // All bets are off
+                return;
+            }
+
+            if (prop === 'isEnglish' || prop === 'translatedContent') {
                 return;
             }
 

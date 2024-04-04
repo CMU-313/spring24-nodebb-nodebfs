@@ -38,7 +38,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       TEST_ENV: ${{ matrix.test_env || 'production' }}
-      TRANSLATOR_API: 'https://translator-service-z6qcfhwzta-uc.a.run.app'
+      TRANSLATOR_API: 'https://translator-service-zxcdypsyua-uc.a.run.app'
 
     services:
       postgres:
