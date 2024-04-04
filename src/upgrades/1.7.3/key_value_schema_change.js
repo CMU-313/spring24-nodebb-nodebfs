@@ -12,7 +12,7 @@ module.exports = {
             [process.env.database]: true,
             database: process.env.database,
         };
-        
+
         const isMongo =
             configJSON.hasOwnProperty('mongo') &&
             configJSON.database === 'mongo';
