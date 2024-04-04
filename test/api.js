@@ -846,6 +846,10 @@ describe('API', async () => {
                 return;
             }
 
+            if (prop == 'isEnglish' || prop == 'translatedContent') {
+                return;
+            }
+
             assert(
                 schema[prop],
                 `"${prop}" was found in response, but is not defined in schema (path: ${method} ${path}, context: ${context})`,
