@@ -40,6 +40,8 @@ get:
                     type: number
                   deleted:
                     type: number
+                  isEnglish:
+                    type: boolean
                   upvotes:
                     type: number
                   downvotes:
@@ -67,6 +69,8 @@ get:
                   anonymous:
                     type: boolean
                     nullable: true
+                required:
+                  - isEnglish: false
 put:
   tags:
     - posts
